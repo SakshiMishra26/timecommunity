@@ -535,8 +535,6 @@ def accept_service(request, service_id):
     return redirect('service_detail', service_id=service_id)
 
 
-
-
 def approve_service(request, id):
     service = get_object_or_404(Service, id=id)
     if service.user != request.user:  
