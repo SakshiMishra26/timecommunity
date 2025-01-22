@@ -1,0 +1,189 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us</title>
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% comment %} <link rel="stylesheet" href="styles.css"> <!-- Add your CSS file for styling --> {% endcomment %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        header {
+            background-color: white;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color:#2a6d56;
+        }
+        
+        section {
+            padding: 20px;
+            margin: 10px;
+        }
+        
+        section h2 {
+            color: #2a6d56;
+        }
+        
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        ul li {
+            margin: 5px 0;
+        }
+        
+        footer {
+            background-color: #2a6d56;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>        
+</head>
+<body>
+    <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <!-- Logo Section -->
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'Logo.png' %}" alt="Logo" width="50" height="54" class="d-inline-block align-text-top">
+                <span class="ms-2">Time Community Bank</span>
+            </a>
+    
+            <!-- Navigation Links -->
+            <ul class="navbar-nav d-flex">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"> <i class="fas fa-home"></i><br>Home</a></li>
+                {% comment %} <li class="nav-item"><a class="nav-link" href="#how-it-works"><i class="fas fa-cogs"></i><br>How It Works</a></li>
+                <li class="nav-item"><a class="nav-link" href="#benefits"> <i class="fas fa-gift"></i><br>Benefits</a></li> {% endcomment %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'service_list' %}"><i class="fas fa-concierge-bell"></i><br>Services</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}"> <i class="fas fa-cogs"></i><br>Admin Panel</a></li>
+
+                <li class="nav-item"><a class="nav-link" href="{% url 'request_list' %}?category=Request"><i class="fas fa-clipboard-list"></i><br>Requests</a></li>
+    
+               
+                <!-- Dropdown for Booking Service -->
+                <li class="nav-item text-center dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-book"></i><br>
+                        Book Service
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'book_service' service_id=1 %}">Book Service</a></li>
+                        <li><a class="dropdown-item" href="{% url 'calendar' %}">Book Calendar</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Link 3</a></li>
+                    </ul>
+                </li>
+
+                {% comment %} <div class="dropdown">
+                    <button class="dropdown-button"><br><i class="fas fa-book">Book Service</button>
+                    <div class="dropdown-content">
+                        <a class="dropdown-item" href="{% url 'book_service' service_id=1 %}">Book Service</a>
+                        <a class="dropdown-item" href="{% url 'calendar' %}">Book Calendar</a>
+
+                        <a class="dropdown-item" href="#">Link 3</a>
+                    </div>
+                </div> {% endcomment %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}"><i class="fas fa-info-circle"></i><br>About Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact"><i class="fas fa-envelope"></i><br>Contact</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'all_reviews' %}"><i class="fas fa-comments"></i><br>Reviews</a></li>
+
+
+                <li class="nav-item text-center dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i><br>
+                        Account
+                    </a>
+                    <ul class="dropdown-menu">
+                        {% if user.is_authenticated %}
+                            <li><a class="dropdown-item" href="{% url 'dashboard' %}">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                        {% else %}
+                            <li><a class="dropdown-item" href="{% url 'login' %}">Login</a></li>
+                            <li><a class="dropdown-item" href="{% url 'register' %}">Register</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+    
+                <!-- Menu Icon (for mobile view) -->
+                <a href="javascript:void(0);" id="menuIcon" class="icon">&#9776;</a>
+            </ul>
+        </div>
+    </nav>
+
+    <header>
+        <h1>About The time Community bank</h1>
+    </header>
+
+    <section id="intro">
+        <p>The time Community bank (TCB) is a mutual support network of people engaged in reciprocal exchange of services, skills, and goods through a timebank where the currency is an hour of time for everyone.</p>
+    </section>
+
+    <section id="membership">
+        <h2>Through membership in The time Community bank, people:</h2>
+        <ul>
+            <li>create and strengthen community bonds.</li>
+            <li>create economic freedom by providing an alternative means to get needs and desires met.</li>
+            <li>encourage creativity in redefining self-sufficiency, interdependence, and valuation of time.</li>
+        </ul>
+    </section>
+
+    <section id="paradigm">
+        <h2>Our Paradigm</h2>
+        <p>The time Community bank introduces a paradigm where members reflect on the available resources in their lives moving from a perception of scarcity and lack to abundance and wholeness.</p>
+    </section>
+
+    <section id="vision">
+        <h2>Our Guiding Vision</h2>
+        <p>Our guiding vision is to make social infrastructure visible within our communities. Social infrastructure describes the invisible bonds and relationships which constitute a generative capital that can be accumulated and circulated through timebanking.</p>
+    </section>
+
+    <section id="mission">
+        <h2>Our Mission</h2>
+        <p>Our mission is to promote and sustain a robust timebanking infrastructure which supports non-monetary transactions amongst individuals and organizations allowing a greater sum of the realized value of work to be retained and shared within local communities.</p>
+    </section>
+
+    <section id="partnership">
+        <h2>Our Focus</h2>
+        <p>We are particularly focused on partnering with organizations which have a broad base of stakeholders who might benefit from deploying timebanking as a method for capturing and compensating work that presently lives in the form of reciprocal goodwill transactions and creating an infrastructure where the time given over to these worthy causes may be traded with other members within the timebank for services those members have offered.</p>
+    </section>
+
+    <section id="goal">
+        <h2>Our Goal</h2>
+        <p>Our goal is to develop and sustain a complementary community currency which decreases financial pressure, reinforces the fabric of trust, and creates new opportunities for engagement between stakeholders within our communities.</p>
+    </section>
+
+    <section id="sponsorship">
+        <h2>Fiscal Sponsorship</h2>
+        <p>The time Community bank is a fiscally sponsored project of Open Collective Foundation.</p>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Local Community Time Bank. All rights reserved.</p>
+        <p>
+            <span class="icon">&#9733;</span>
+            <span class="icon">&#9734;</span>
+            <span class="icon">&#9829;</span>
+        </p>
+    </footer>
+</body>
+</html>

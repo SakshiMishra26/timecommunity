@@ -1,0 +1,202 @@
+{% comment %} 
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ service.name }} - Details</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <h1>{{ service.name }}</h1>
+    <p>{{ service.description }}</p>
+    
+    <h2>Reviews</h2>
+    {% for review in reviews %}
+        <div class="review">
+            <p><strong>{{ review.user.username }}</strong> rated it {{ review.rating }}/5</p>
+            <p>{{ review.comment }}</p>
+        </div>
+    {% empty %}
+        <p>No reviews yet. Be the first to review!</p>
+    {% endfor %}
+
+    <a href="{% url 'add_review' service.id %}">Add a Review</a>
+</body>
+</html> {% endcomment %}
+
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ service.title }} - Details</title>
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</head>
+<style>
+    .review {
+        background-color: #f9f9f9;
+    }
+    
+    .review strong {
+        color: #555;
+    }
+    
+    .review small {
+        color: #888;
+    }</style>
+<body>
+    <script>
+        document.getElementById('menuIcon').addEventListener('click', function() {
+            var nav = document.querySelector('.navbar-nav');
+            nav.classList.toggle('active');
+        });
+
+        document.querySelector('.dropdown-button').addEventListener('click', function() {
+            const dropdownContent = document.querySelector('.dropdown-content');
+            dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.read-more-btn').forEach(button => {
+              button.addEventListener('click', () => {
+                const cardText = button.previousElementSibling; // Get the previous sibling <p> element
+                const moreText = cardText.querySelector('.more-text');
+                
+                if (moreText) {
+                  const isHidden = moreText.style.display === 'none';
+                  moreText.style.display = isHidden ? 'inline' : 'none';
+                  button.textContent = isHidden ? 'Read Less' : 'Read More';
+                }
+              });
+            });
+          });
+          
+          
+          
+        
+    </script>
+
+    <!-- Navigation Bar -->
+   
+    <nav class="navbar navbar-expand-lg  custom-navbar">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <!-- Logo Section -->
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'Logo.png' %}" alt="Logo" width="100" height="114" class="d-inline-block align-text-top">
+                <span class="ms-2">Time Community Bank</span>
+            </a>
+    
+            <!-- Navigation Links -->
+            <ul class="navbar-nav d-flex">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"> <i class="fas fa-home"></i><br>Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'service_list' %}"><i class="fas fa-concierge-bell"></i><br>Services</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}"> <i class="fas fa-cogs"></i><br>Admin Panel</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'request_list' %}?category=Request"><i class="fas fa-clipboard-list"></i><br>Requests</a></li>
+                
+                <!-- Dropdown for Booking Service -->
+                <li class="nav-item text-center dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-book"></i><br>Book Service
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'book_service' service_id=1 %}">Book Service</a></li>
+                        <li><a class="dropdown-item" href="{% url 'calendar' %}">Book Calendar</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Link 3</a></li>
+                    </ul>
+                </li>
+    
+                <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}"><i class="fas fa-info-circle"></i><br>About Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact"><i class="fas fa-envelope"></i><br>Contact</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'all_reviews' %}"><i class="fas fa-comments"></i><br>Reviews</a></li>
+    
+                <li class="nav-item text-center dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i><br>Account
+                    </a>
+                    <ul class="dropdown-menu">
+                        {% if user.is_authenticated %}
+                            <li><a class="dropdown-item" href="{% url 'dashboard' %}">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                        {% else %}
+                            <li><a class="dropdown-item" href="{% url 'login' %}">Login</a></li>
+                            <li><a class="dropdown-item" href="{% url 'register' %}">Register</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+    
+                <!-- Menu Icon (for mobile view) -->
+                <a href="javascript:void(0);" id="menuIcon" class="icon">&#9776;</a>
+            </ul>
+        </div>
+    </nav>
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-6">
+                {% if service.image %}
+                    <img src="{{ service.image.url }}" alt="{{ service.title }}" class="img-fluid rounded">
+                {% else %}
+                    <p>No image available for this service.</p>
+                {% endif %}
+            </div>
+            
+            <div class="col-md-6">
+                <h1>{{ service.title }}</h1>
+                <p>{{ service.description }}</p>
+                <p><strong>Category:</strong> {{ service.category }}</p>
+                <p><strong>Hours Offered:</strong> {{ service.hours_offered }}</p>
+                <p><strong>Offer given by:</strong>{{service.user}}
+                <p><strong>Price:</strong>{{service.price}}<br>
+
+                {% comment %} <p><strong>Acceptance status:</strong>{{service.accepted}} {% endcomment %}
+                {% if service.accepted_by %}
+                    <p><strong>Accepted by:</strong> {{ service.accepted_by }}</p>
+                {% endif %}
+            
+
+                {% if service.accepted %}
+                    <p>This offer has been accepted.</p>
+                {% elif service.created_by == user %}
+                    <p>You cannot accept your own offer.</p>
+                {% else %}
+                    <a href="{% url 'accept_offer' service.id %}" class="btn btn-success">Accept Offer</a>
+                {% endif %}
+            </div>
+        </div>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+        <div class="mt-5">
+            <h2>Reviews</h2>
+            {% for review in reviews %}
+                <div class="review border rounded p-3 my-3">
+                    <strong>{{ review.user.username }}</strong> rated it {{ review.rating }}/5
+                    <p>{{ review.comment }}</p>
+                    <small class="text-muted">Posted on: {{ review.created_at }}</small>
+                </div>
+            {% empty %}
+                <p>No reviews yet. Be the first to leave one!</p>
+            {% endfor %}
+            <a href="{% url 'add_review' service.id %}" class="btn btn-primary mt-3">Leave a Review</a>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

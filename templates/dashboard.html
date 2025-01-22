@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+
+</head>
+<body>
+
+      <!-- Navbar -->
+      <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <!-- Logo Section -->
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'Logo.png' %}" alt="Logo" width="50" height="54" class="d-inline-block align-text-top">
+                <span class="ms-2">Time Community Bank</span>
+            </a>
+    
+            <!-- Navigation Links -->
+            <ul class="navbar-nav d-flex">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"> <i class="fas fa-home"></i><br>Home</a></li>
+              
+                <li class="nav-item"><a class="nav-link" href="{% url 'service_list' %}"><i class="fas fa-concierge-bell"></i><br>Services</a></li>
+
+                <li class="nav-item"><a class="nav-link" href="{% url 'request_list' %}?category=Request"><i class="fas fa-clipboard-list"></i><br>Requests</a></li>
+    
+               
+                <!-- Dropdown for Booking Service -->
+                <li class="nav-item text-center dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-book"></i><br>
+                        Book Service
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'book_service' service_id=1 %}">Book Service</a></li>
+                        <li><a class="dropdown-item" href="{% url 'calendar' %}">Book Calendar</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Link 3</a></li>
+                    </ul>
+                </li>
+
+                {% comment %} <div class="dropdown">
+                    <button class="dropdown-button"><br><i class="fas fa-book">Book Service</button>
+                    <div class="dropdown-content">
+                        <a class="dropdown-item" href="{% url 'book_service' service_id=1 %}">Book Service</a>
+                        <a class="dropdown-item" href="{% url 'calendar' %}">Book Calendar</a>
+
+                        <a class="dropdown-item" href="#">Link 3</a>
+                    </div>
+                </div> {% endcomment %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}"><i class="fas fa-info-circle"></i><br>About Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact"><i class="fas fa-envelope"></i><br>Contact</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'all_reviews' %}"><i class="fas fa-comments"></i><br>Reviews</a></li>
+
+
+                <li class="nav-item text-center dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i><br>
+                        Account
+                    </a>
+                    <ul class="dropdown-menu">
+                        {% if user.is_authenticated %}
+                            <li><a class="dropdown-item" href="{% url 'dashboard' %}">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                        {% else %}
+                            <li><a class="dropdown-item" href="{% url 'login' %}">Login</a></li>
+                            <li><a class="dropdown-item" href="{% url 'register' %}">Register</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+    
+                <!-- Menu Icon (for mobile view) -->
+                <a href="javascript:void(0);" id="menuIcon" class="icon">&#9776;</a>
+            </ul>
+        </div>
+    </nav>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('menuIcon').addEventListener('click', function() {
+            var nav = document.querySelector('.navbar-nav');
+            nav.classList.toggle('active');
+        });
+
+        document.querySelector('.dropdown-button').addEventListener('click', function() {
+            const dropdownContent = document.querySelector('.dropdown-content');
+            dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+        });
+        
+    </script>
+    <h2>Welcome to Your Dashboard, {{ user.username }}</h2>
+
+    <h3>Your Time Credit Balance: {{ time_credit.balance }} hours</h3>
+
+    <h3>Your Services</h3>
+    <ul>
+        {% for service in services %}
+            <li>{{ service.title }} - {{ service.hours_offered }} hours
+                <a href="{% url 'log_hours' service.id %}">Log Hours</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h3>Transaction History</h3>
+    <ul>
+        {% for transaction in transactions %}
+            <li>{{ transaction.date }} - {{ transaction.transaction_type }} - {{ transaction.hours }} hours</li>
+        {% endfor %}
+    </ul>
+
+
+    <!-- Accepted Requests Section -->
+    <h3>Requests You've Accepted</h3>
+    <ul>
+        {% for request in accepted_requests %}
+            <li>{{ request.title }} - Requested by {{ request.requested_by.username }}
+                <a href="{% url 'request_detail' request.id %}">View Details</a>
+            </li>
+        {% empty %}
+            <p>No requests accepted yet.</p>
+        {% endfor %}
+    </ul>
+    
+    {% comment %} <a href="{% url 'manage_credits' %}">Manage Credits</a>
+    <a href="{% url 'logout' %}">Logout</a> {% endcomment %}
+    <form action="{% url 'manage_credits' %}" method="get" style="display:inline;">
+        <button type="submit" class="btn" style="width: 250px; height: 40px; font-size: 16px;">Manage Credits</button>
+    </form>
+    
+    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn" style="width: 250px; height: 40px; font-size: 16px;">Logout</button>
+    </form>
+
+    <footer>
+        <p>&copy; 2025 Local Community Time Bank. All rights reserved.</p>
+        <p>
+            <span class="icon">&#9733;</span>
+            <span class="icon">&#9734;</span>
+            <span class="icon">&#9829;</span>
+        </p>
+    </footer>
+    <script src="{% static 'script.js' %}"></script>
+    
+    
+
+</body>
+</html>

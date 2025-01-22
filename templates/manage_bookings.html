@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Bookings</title>
+</head>
+<body>
+    <h2>My Bookings</h2>
+    <ul>
+        {% for booking in bookings %}
+            <li>{{ booking.service.title }} on {{ booking.date }} at {{ booking.time }} - {% if booking.confirmed %}Confirmed{% else %}Pending{% endif %}</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'home' %}">Back to Home</a>
+</body>
+</html>

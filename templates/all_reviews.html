@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us</title>
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% comment %} <link rel="stylesheet" href="styles.css"> <!-- Add your CSS file for styling --> {% endcomment %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        header {
+            background-color: white;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color:#2a6d56;
+        }
+        
+        section {
+            padding: 20px;
+            margin: 10px;
+        }
+        
+        section h2 {
+            color: #2a6d56;
+        }
+        
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        ul li {
+            margin: 5px 0;
+        }
+        
+        footer {
+            background-color: #2a6d56;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>        
+</head>
+<body>
+    <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <!-- Logo Section -->
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'Logo.png' %}" alt="Logo" width="50" height="54" class="d-inline-block align-text-top">
+                <span class="ms-2">Time Community Bank</span>
+            </a>
+    
+            <!-- Navigation Links -->
+            <ul class="navbar-nav d-flex">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"> <i class="fas fa-home"></i><br>Home</a></li>
+                {% comment %} <li class="nav-item"><a class="nav-link" href="#how-it-works"><i class="fas fa-cogs"></i><br>How It Works</a></li>
+                <li class="nav-item"><a class="nav-link" href="#benefits"> <i class="fas fa-gift"></i><br>Benefits</a></li> {% endcomment %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'service_list' %}"><i class="fas fa-concierge-bell"></i><br>Services</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}"> <i class="fas fa-cogs"></i><br>Admin Panel</a></li>
+
+                <li class="nav-item"><a class="nav-link" href="{% url 'request_list' %}?category=Request"><i class="fas fa-clipboard-list"></i><br>Requests</a></li>
+    
+               
+                <!-- Dropdown for Booking Service -->
+                <li class="nav-item text-center dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-book"></i><br>
+                        Book Service
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'book_service' service_id=1 %}">Book Service</a></li>
+                        <li><a class="dropdown-item" href="{% url 'calendar' %}">Book Calendar</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Link 3</a></li>
+                    </ul>
+                </li>
+
+                {% comment %} <div class="dropdown">
+                    <button class="dropdown-button"><br><i class="fas fa-book">Book Service</button>
+                    <div class="dropdown-content">
+                        <a class="dropdown-item" href="{% url 'book_service' service_id=1 %}">Book Service</a>
+                        <a class="dropdown-item" href="{% url 'calendar' %}">Book Calendar</a>
+
+                        <a class="dropdown-item" href="#">Link 3</a>
+                    </div>
+                </div> {% endcomment %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}"><i class="fas fa-info-circle"></i><br>About Us</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact"><i class="fas fa-envelope"></i><br>Contact</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'all_reviews' %}"><i class="fas fa-comments"></i><br>Reviews</a></li>
+
+
+                <li class="nav-item text-center dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i><br>
+                        Account
+                    </a>
+                    <ul class="dropdown-menu">
+                        {% if user.is_authenticated %}
+                            <li><a class="dropdown-item" href="{% url 'dashboard' %}">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                        {% else %}
+                            <li><a class="dropdown-item" href="{% url 'login' %}">Login</a></li>
+                            <li><a class="dropdown-item" href="{% url 'register' %}">Register</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+    
+                <!-- Menu Icon (for mobile view) -->
+                <a href="javascript:void(0);" id="menuIcon" class="icon">&#9776;</a>
+            </ul>
+        </div>
+    </nav>
+    <h1>All Reviews</h1>
+    {% for review in reviews %}
+        <div>
+            <h3>{{ review.user.username }} rated {{review.service}} {{ review.rating }}/5</h3>
+            <p>{{ review.comment }}</p>
+        </div>
+    {% empty %}
+        <p>No reviews available.</p>
+    {% endfor %}
+</body>
+</html>

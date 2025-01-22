@@ -1,0 +1,59 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Hours</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}"> <!-- Link to your CSS file -->
+</head>
+<body>
+    
+    <header>
+        <h1>Log Hours</h1>
+    </header>
+
+    <main>
+        <main>
+            {% comment %} <section>
+                
+                <h2>Service Details</h2>
+               <p><strong>Service Title:</strong> {% if time_credit.service %}{{ time_credit.service.title }}{% else %}No service available{% endif %}</p>
+               <p><strong>Description:</strong> {% if time_credit.service %}{{ time_credit.service.description }}{% else %}No description available{% endif %}</p>
+                <p><strong>Hours Available:</strong> {{ time_credit.hours_available }}</p>
+            </section> {% endcomment %}
+        
+            <section>
+                <h3>Log Hours for {{ service.title }}</h3>
+{% if error %}
+    <p class="error">{{ error }}</p>
+{% endif %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+</form>
+
+<p>Hours Available: {{ hours_available }}</p>
+            </section>
+
+           
+
+            {% comment %} <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                {% if error %}
+                    <p style="color: red;">{{ error }}</p>
+                {% endif %}
+                <button type="submit">Log Hours</button>
+            </form> {% endcomment %}
+       
+        
+    </main>
+
+    <footer>
+        <a href="{% url 'dashboard' %}" class="btn">Back to Dashboard</a>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,289 @@
+/* General Body Styling */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* Header Styling */
+
+header {
+    background-color: #2a9d8f;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+
+/* Navigation Styling */
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+
+/* Call to Action Button Styling */
+
+.cta-button {
+    background-color: #e76f51;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.cta-button:hover {
+    background-color: #f4a261;
+}
+
+
+/* Section Styling */
+
+section {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+
+/* Hero Section Styling */
+
+#hero {
+    background-color: #264653;
+    color: white;
+    padding: 60px 20px;
+}
+
+
+/* Footer Styling */
+
+footer {
+    background-color: #2a9d8f;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+}
+
+
+/* Register and Login Form Styling */
+
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+form input,
+form button {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+
+/* Focus Styling for Inputs */
+
+form input:focus,
+form button:focus {
+    outline: none;
+    border-color: #e76f51;
+}
+
+
+/* Style for Submit Button */
+
+button {
+    background-color: #e76f51;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+}
+
+button:hover {
+    background-color: #e76f51;
+}
+
+
+/* Hidden CSRF Token Field */
+
+form input[type="hidden"] {
+    display: none;
+}
+
+
+/* Margin Styling for Form Elements */
+
+form p {
+    margin-bottom: 10px;
+}
+
+
+/* Optional Styling for Register and Login Buttons */
+
+form button[type="submit"] {
+    font-size: 16px;
+    background-color: #e76f51;
+}
+
+form button[type="submit"]:hover {
+    background-color: #f4a261;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: center;
+    /* Center the buttons horizontally */
+    gap: 10px;
+    /* Add space between buttons */
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #e76f51;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #e76f51;
+}
+
+
+/* Dashboard Page Styling */
+
+
+/* Centering the Dashboard content */
+
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.dashboard-container h2 {
+    font-size: 28px;
+    color: #333;
+}
+
+.dashboard-container h3 {
+    font-size: 20px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.dashboard-container ul {
+    list-style: none;
+    padding: 0;
+}
+
+.dashboard-container ul li {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+.dashboard-container ul li a {
+    color: #5b9bd5;
+    text-decoration: none;
+}
+
+.dashboard-container ul li a:hover {
+    text-decoration: underline;
+}
+
+.dashboard-container a {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #e76f51;
+    text-decoration: none;
+}
+
+.dashboard-container a:hover {
+    color: #f4a261;
+}
+
+
+/* Add Service Page Styling */
+
+
+/* Centering the Add Service content */
+
+.add-service-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.add-service-container h2 {
+    font-size: 28px;
+    color: #333;
+}
+
+.add-service-container form {
+    width: 300px;
+    margin-top: 20px;
+}
+
+.add-service-container form button {
+    background-color: #5b9bd5;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+.add-service-container form button:hover {
+    background-color: #4a8bb0;
+}
+
+.add-service-container a {
+    font-size: 16px;
+    color: #e76f51;
+    text-decoration: none;
+    margin-top: 20px;
+}
+
+.add-service-container a:hover {
+    color: #f4a261;
+}

@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Credits</title>
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+
+</head>
+<body>
+    <h2>Manage Time Credits</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+    {% comment %} <button type="submit"> <a href="{% url 'dashboard' %}">Back to Dashboard</a></button> {% endcomment %}
+    <form action="{% url 'dashboard' %}" method="get">
+        <button type="submit">Back to Dashboard</button>
+    </form>
+</body>
+</html>

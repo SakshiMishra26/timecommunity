@@ -1,0 +1,166 @@
+/* General Layout and Spacing */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* Navbar Styling */
+
+.navbar {
+    background-color: #007bff;
+    padding: 10px 20px;
+}
+
+.navbar-brand {
+    color: #fff;
+    font-size: 20px;
+}
+
+.navbar-nav .nav-item .nav-link {
+    color: #fff;
+    font-size: 16px;
+}
+
+
+/* Main Content Styling */
+
+.container {
+    padding: 20px;
+}
+
+h1,
+h2 {
+    color: #333;
+}
+
+h3 {
+    color: #007bff;
+}
+
+
+/* Form and Button Styling */
+
+form {
+    margin-bottom: 20px;
+}
+
+button {
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+
+/* Add Service Button */
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+
+/* Edit Button Styling */
+
+.btn-secondary {
+    background-color: #6c757d;
+    border: none;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+
+/* Service List Styling */
+
+.service-list {
+    margin-top: 20px;
+}
+
+.service-item {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+
+.service-item h3 {
+    margin-top: 0;
+}
+
+.service-item p {
+    margin: 5px 0;
+}
+
+
+/* Flexbox Layout for Buttons */
+
+.d-flex {
+    display: flex;
+    justify-content: space-between;
+}
+
+.filter-form {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.filter-form select,
+.filter-form button {
+    font-size: 16px;
+    padding: 10px;
+    margin-right: 10px;
+}
+
+
+/* Footer Styling */
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+
+/* Responsive Design */
+
+@media (max-width: 768px) {
+    .navbar-nav {
+        flex-direction: column;
+        margin-top: 10px;
+    }
+    .d-flex {
+        flex-direction: column;
+    }
+    .filter-form {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}

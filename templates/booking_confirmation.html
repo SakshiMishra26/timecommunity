@@ -1,0 +1,17 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Bookings</title>
+</head>
+<body>
+    <h2>Booking Confirmation</h2>
+<p>Service: {{ booking.service.title }}</p>
+<p>Date: {{ booking.date }}</p>
+<p>Time: {{ booking.time }}</p>
+<p>Status: {{ booking.status }}</p>
+    <a href="{% url 'home' %}">Back to Home</a>
+</body>
+</html>
