@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import RegisterForm, TimeTransactionForm,LogHoursForm,ServiceForm,BookingForm,ReviewForm
-from .models import Service, TimeCredit,TimeTransaction,Booking,Review,UserActivity
+from .models import Service, TimeCredit,TimeTransaction,Booking,Review,UserActivity,Notification
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
@@ -12,8 +12,52 @@ from django.http import JsonResponse
 from django.contrib import messages
 from .models import ServiceRequest,Transaction,Request
 from .forms import ServiceRequestForm
+from django.conf import settings
 
 
+
+# @login_required
+# def give_time_credit(request, worker_id):
+#     # Fetch the worker user (the one who did the work)
+#     worker = get_object_or_404(User, id=worker_id)
+
+#     # Fetch the user who is giving the credit (the logged-in user)
+#     giver = request.user
+#     giver_profile = giver.userprofile
+
+#     if request.method == 'POST':
+#         form = TimeCreditForm(request.POST)
+#         if form.is_valid():
+#             amount = form.cleaned_data['amount']
+#             description = form.cleaned_data['description']
+
+#             # Check if giver has enough time credits
+#             if giver_profile.time_credits >= amount:
+#                 # Deduct credits from the giver
+#                 giver_profile.time_credits -= amount
+#                 giver_profile.save()
+
+#                 # Add credits to the receiver (worker)
+#                 receiver_profile = worker.userprofile
+#                 receiver_profile.time_credits += amount
+#                 receiver_profile.save()
+
+#                 # Record the transaction
+#                 transaction = TimeCredit.objects.create(
+#                     giver=giver,
+#                     receiver=worker,
+#                     amount=amount,
+#                     description=description
+#                 )
+
+#                 return redirect('dashboard')  # Redirect to the dashboard or another page
+#             else:
+#                 return HttpResponse("You do not have enough time credits.", status=400)
+
+#     else:
+#         form = TimeCreditForm()
+
+#     return render(request, 'give_time_credit.html', {'form': form, 'worker': worker})
 
 
 
@@ -22,12 +66,15 @@ from .forms import ServiceRequestForm
 def about_us(request):
     return render(request, 'about_us.html')
 
-# def home(request):
-#     return render(request, 'home.html')
+
 
 def home(request):
     # services = Service.objects.all() 
-    services = Service.objects.all()[:4]  # Assuming you have a Service model for offers
+    services = Service.objects.filter(is_approved=True)[:4]
+    # pending_services = Service.objects.filter(is_approved=False)
+    # approved_services = Service.objects.filter(is_approved=True)  # To be used elsewhere on the page if needed
+
+  
     service_requests = ServiceRequest.objects.all()[:4]  # Fetch all service requests
     return render(request, 'home.html', {
         'services': services,
@@ -48,12 +95,40 @@ def register(request):
             password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=password)
             login(request, user)
-            return redirect('index')
+            return redirect('home.html')
     else:
         form = RegisterForm()
     return render(request, 'register.html', {'form': form})
 
+# from django.urls import reverse
+# from .forms import CustomRegistrationForm
+
+# def register(request):
+#     if request.method == 'POST':
+#         form = CustomRegistrationForm(request.POST)
+#         if form.is_valid():
+#             # Create a new user object
+#             user = form.save(commit=False)
+#             user.set_password(form.cleaned_data['password'])
+#             user.save()
+
+#             # Optionally log the user in after registration
+#             login(request, user)
+
+#             # Redirect to the default login redirect page
+#             return redirect(reverse('login'))  # Replace 'login' with the name of your desired page
+#     else:
+#         form = CustomRegistrationForm()
+
+#     return render(request, 'register.html', {'form': form})
+
+# from .models import UserProfile
+
 def login_view(request):
+    # user = request.user
+
+    # profile, created = UserProfile.objects.get_or_create(user=user)
+
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -66,7 +141,46 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
+# from django.views.decorators.csrf import csrf_exempt
 
+# def login_view(request):
+#     if request.method == 'POST':
+#         form = AuthenticationForm(request, data=request.POST)
+#         if form.is_valid():
+#             username = form.cleaned_data.get('username')
+#             password = form.cleaned_data.get('password')
+#             user = authenticate(username=username, password=password)
+#             if user is not None:
+#                 login(request, user)
+
+#                 # Check if the user has a UserProfile
+#                 try:
+#                     user_profile = user.userprofile
+#                 except ObjectDoesNotExist:
+#                     user_profile = None
+
+#                 if user_profile is None:
+#                     # Create a UserProfile for the user
+#                     user_profile = UserProfile.objects.create(user=user)
+                    
+#                 return redirect('dashboard')  # Redirect to the index page or dashboard
+#         else:
+#             form.add_error(None, 'Invalid username or password')
+
+#     else:
+#         form = AuthenticationForm()
+
+#     return render(request, 'login.html', {'form': form})
+
+# def test_csrf_view(request):
+#     if request.method == 'POST':
+#         return render(request, 'test_csrf_success.html')
+#     return render(request, 'test_csrf_form.html')
+
+# from django.http import HttpResponseForbidden
+
+# def custom_csrf_failure(request, reason=""):
+#     return HttpResponseForbidden(f"CSRF Failed: {reason}")
 
 
 def logout_view(request):
@@ -83,7 +197,9 @@ def logout_view(request):
 @login_required
 def dashboard(request):
     user = request.user
+    # user_profile = request.user.userprofile
 
+    
     # Fetch the TimeCredit object for the logged-in user
     try:
         time_credit = TimeCredit.objects.get(user=user)
@@ -95,19 +211,75 @@ def dashboard(request):
 
     # Fetch services offered by the user
     services = Service.objects.filter(user=user)
+    unread_notifications = user.notifications.filter(is_read=False)
+
 
     # Fetch service requests accepted by the user
     # accepted_requests = ServiceRequest.objects.filter(accepted_by=user)
-    accepted_requests = ServiceRequest.objects.filter(accepted_by=None).exclude(user=user)
+    # accepted_requests = ServiceRequest.objects.filter(accepted_by=None).exclude(user=user)
+    accepted_requests = ServiceRequest.objects.filter(accepted=True, accepted_by=request.user)
+
+    
 
 
     return render(request, 'dashboard.html', {
         'user': user,
-        'time_credit': time_credit,
+        # 'user_profile': user_profile,
+        'time_credits': request.user,
         'transactions': transactions,
         'services': services,
-        'accepted_requests': accepted_requests,  # Pass the accepted requests to the template
+        'accepted_requests': accepted_requests, 
+        'unread_notifications': unread_notifications,
+ 
     })
+
+
+
+# from django.core.exceptions import ObjectDoesNotExist
+
+# @login_required
+# def dashboard(request):
+#     # Fetch the user profile
+#     try:
+#         user_profile = request.user.userprofile
+#     except ObjectDoesNotExist:
+#         user_profile = None
+
+#     services = Service.objects.filter(user=user_profile)
+
+#     # Fetch TimeCredit transactions where the user is either the giver or receiver
+#     time_credits_given = TimeCredit.objects.filter(giver=request.user)
+#     time_credits_received = TimeCredit.objects.filter(receiver=request.user)
+
+#     # Fetch transactions for the user
+#     transactions = TimeTransaction.objects.filter(user=user_profile)
+
+#     # Fetch services offered by the user
+#     print(f"Services in view: {services}")
+
+#     # Fetch unread notifications for the user
+#     unread_notifications = user_profile.notifications.filter(is_read=False) if user_profile else None
+
+#     # Fetch service requests accepted by the user
+#     accepted_requests = ServiceRequest.objects.filter(accepted_by=None).exclude(user=user_profile)
+
+#     return render(request, 'dashboard.html', {
+#         'user_profile': user_profile,
+#         'time_credits_given': time_credits_given,
+#         'time_credits_received': time_credits_received,
+#         'transactions': transactions,
+#         'services': services,
+#         'accepted_requests': accepted_requests,
+#         'unread_notifications': unread_notifications,
+#     })
+
+
+@login_required
+def mark_notification_as_read(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+    notification.is_read = True
+    notification.save()
+    return redirect('dashboard')
 
 
 def manage_credits(request):
@@ -256,30 +428,38 @@ def edit_service(request, service_id):
     return render(request, 'edit_service.html', {'form': form})
 
  
+from django.shortcuts import render
+from .models import Service
+
 def service_list(request):
-    services = Service.objects.all()
+    # Fetching services for superusers
+    if request.user.is_superuser:
+        # Pending services (is_approved=False)
+        pending_services = Service.objects.filter(is_approved=False)
+        # Approved services (is_approved=True)
+        services = Service.objects.all()
+        approved_services = Service.objects.filter(is_approved=True)
+    else:
+        # Non-admin users will only see approved services
+        approved_services = Service.objects.filter(is_approved=True)
+        pending_services = []  # No pending services for non-admin users
+        services = Service.objects.filter(is_approved=True)
+
+    # Optional: Filter by category if provided
     category = request.GET.get('category')
-    # if request.is_ajax():
-    #     data = list(services.values('id', 'name', 'description'))
-    #     return JsonResponse({'services': data})
     if category:
+        approved_services = approved_services.filter(category=category)
+        pending_services = pending_services.filter(category=category)
         services = services.filter(category=category)
-    return render(request, 'service_list.html', {'services': services})
+
+    # Pass both pending and approved services to the template
+    return render(request, 'service_list.html', {
+        'pending_services': pending_services,
+        'approved_services': approved_services,
+        'services': services
+    })
 
 
-from django.http import JsonResponse
-
-def service_list(request):
-    category = request.GET.get('category', 'All')
-    services = Service.objects.filter(category=category) if category != 'All' else Service.objects.all()
-
-    # Check for AJAX request
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        # Return JSON response for AJAX requests
-        return JsonResponse({'services': list(services.values())})
-
-    # Render normal response for non-AJAX requests
-    return render(request, 'service_list.html', {'services': services})
 
 
 @login_required
@@ -392,11 +572,62 @@ def accept_service_request(request, request_id):
     else:
         messages.warning(request, "This request has already been accepted.")
 
+    # Create a notification for the user who posted the request
+    notification_message = f"Your request '{service_request.title}' has been accepted by {request.user.username}."
+    Notification.objects.create(
+        recipient=service_request.user,
+        message=notification_message
+    )
+         # Send an email notification to the user
+    subject = "Your Service Request Has Been Accepted"
+    message = f"Hi {service_request.user.username},\n\nYour request '{service_request.title}' has been accepted by {request.user.username}. Please check your dashboard for more details.\n\nThank you for using Time Community Bank."
+    recipient_email = service_request.user.email
+    send_mail(
+        subject,
+        message,
+        settings.EMAIL_HOST_USER,
+        [recipient_email],
+        fail_silently=False,
+    )
+
+    messages.success(request, f"You have successfully accepted the request '{service_request.title}'.")
     return redirect('request_detail', request_id=service_request.id)
 
-   
 
-   
+@login_required
+def accepted_requests_view(request):
+    # Get requests accepted by the current user
+    accepted_requests = ServiceRequest.objects.filter(accepted=True, accepted_by=request.user)
+    # return render(request, 'dashboard.html', {'accepted_requests': accepted_requests})
+    return render(request, 'accepted_requests.html', {'accepted_requests': accepted_requests})
+
+# def service_requests_view(request):
+    context = {
+        'service_requests': ServiceRequest.objects.all(),
+        'user': request.user  # Pass the logged-in user to the template
+    }
+    return render(request, 'request_list.html', context)
+
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+@login_required
+def request_detail(request, request_id):
+    service_request = get_object_or_404(Request, id=request_id)
+
+    # Check if the current user owns the request
+    if request.method == 'POST' and service_request.user == request.user:
+        location = request.POST.get('location')  # Get the new location from the form
+        logger.info(f"Updating location for request ID {request_id}: {location}")
+
+        if location:
+            service_request.location = location  # Update the location in the database
+            service_request.save()
+            return redirect('request_detail', request_id=request_id)
+
+    return render(request, 'request_detail.html', {'request': service_request})
 
 @login_required
 def edit_service_request(request, request_id):
@@ -516,9 +747,9 @@ def service_detail(request, service_id):
 
 
 
-# def request_detail(request, pk):
+# def request_detail(request, request_id):
 #     print(Request.objects.all())  # Debugging line
-#     request_obj = get_object_or_404(Request, pk=pk)
+#     request_obj = get_object_or_404(Request, request_id=request_id)
 #     return render(request, 'request_detail.html', {'request': request_obj})
 
 def request_detail(request, request_id):
@@ -534,23 +765,29 @@ def accept_service(request, service_id):
     # For now, redirect back to the service detail page
     return redirect('service_detail', service_id=service_id)
 
+from django.contrib.auth.decorators import user_passes_test
+
+@user_passes_test(lambda u: u.is_superuser)
 
 def approve_service(request, id):
     service = get_object_or_404(Service, id=id)
-    if service.user != request.user:  
-        service.is_approved = True
+    # if service.user != request.user:  
+    #     service.is_approved = True
+    service.is_approved = True
+
     service.save()
     messages.success(request, f'Service "{service.title}" has been approved.')
 
-    return redirect('home')  
+    return redirect('service_list')  
 
+@user_passes_test(lambda u: u.is_superuser)
 def reject_service(request, id):
     service = get_object_or_404(Service, id=id)
     service.is_approved = False
-    service.save()
+    service.delete()
     messages.warning(request, f'Service "{service.title}" has been rejected.')
 
-    return redirect('home')  # Red
+    return redirect('service_list')  # Red
 
 def service_moderation(request):
     # Fetch the services (you can filter them based on approval status or other conditions)
@@ -571,3 +808,102 @@ def create_service(request):
     else:
         form = ServiceForm()
     return render(request, 'create_service.html', {'form': form})
+
+from .forms import UserLocationForm
+from .models import UserLocation
+
+
+
+def update_location(request,request_id):
+    # Check if the user already has a location
+    try:
+        user_location = request.user.userlocation
+    except UserLocation.DoesNotExist:
+        user_location = None
+
+    # If POST request, update location
+    if request.method == 'POST':
+        form = UserLocationForm(request.POST)
+        if form.is_valid():
+            # If user does not have a location, create one
+            if not user_location:
+                user_location = UserLocation(user=request.user)  # Ensure user is assigned
+
+            # Update user location fields
+            user_location.city = form.cleaned_data['city']
+            user_location.state = form.cleaned_data['state']
+            user_location.country = form.cleaned_data['country']
+            user_location.save()
+
+            messages.success(request, "Location updated successfully!")
+            return redirect('request_detail', request_id=request_id)  # Redirect to profile page or any other page
+    else:
+        # If GET request, use current location data (if exists) to pre-populate the form
+        form = UserLocationForm(instance=user_location)
+
+    return render(request, 'update_location.html', {'form': form})
+
+
+@login_required
+def profile(request):
+    # Get the user's location if available
+    try:
+        user_location = request.user.userlocation
+    except UserLocation.DoesNotExist:
+        user_location = None
+
+    return render(request, 'profile.html', {'user_location': user_location})
+
+
+@login_required
+def mark_as_completed(request, request_id):
+    service_request = get_object_or_404(ServiceRequest, id=request_id)
+
+    if service_request.provider != request.user:
+        messages.error(request, "You can only mark tasks you are fulfilling as completed.")
+        return redirect('dashboard')
+
+    if service_request.is_completed:
+        messages.warning(request, "This task is already marked as completed.")
+    else:
+        service_request.is_completed = True
+        service_request.save()
+        messages.success(request, "You have marked the task as completed. Waiting for approval from the requester.")
+
+    return redirect('dashboard')
+
+
+@login_required
+def approve_task(request, request_id):
+    service_request = get_object_or_404(ServiceRequest, id=request_id)
+
+    if service_request.user != request.user:
+        messages.error(request, "You can only approve tasks you requested.")
+        return redirect('dashboard')
+
+    if not service_request.is_completed:
+        messages.warning(request, "The task is not marked as completed yet.")
+        return redirect('dashboard')
+
+    if service_request.is_approved:
+        messages.warning(request, "This task has already been approved.")
+    else:
+        # Transfer TimeCredits
+        provider_credit, _ = TimeCredit.objects.get_or_create(user=service_request.provider)
+        requester_credit = get_object_or_404(TimeCredit, user=service_request.user)
+
+        if requester_credit.balance >= service_request.credit_amount:
+            # Deduct from requester and add to provider
+            requester_credit.balance -= service_request.credit_amount
+            provider_credit.balance += service_request.credit_amount
+            requester_credit.save()
+            provider_credit.save()
+
+            service_request.is_approved = True
+            service_request.save()
+
+            messages.success(request, f"You have approved the task. {service_request.credit_amount} TimeCredits transferred to {service_request.provider.username}.")
+        else:
+            messages.error(request, "You do not have enough balance to approve this task.")
+
+    return redirect('dashboard')

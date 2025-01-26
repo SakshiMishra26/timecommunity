@@ -42,7 +42,30 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 </head>
-<style>
+    <style>
+        /* Custom Styles for Navbar */
+    .custom-navbar {
+        background-color:#2a6d56 !important; /* Changed navbar background color to green */
+    }
+
+    .custom-navbar .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color:white;
+    }
+    
+    .custom-navbar .nav-link {
+        color: white !important; /* Overriding default navbar link color */
+    }
+    
+    .custom-navbar .nav-link:hover {
+        color: orange !important; /* Overriding default hover color */
+    }
+    
+    /* Navbar on mobile */
+    .custom-navbar .navbar-toggler {
+        background-color: black;
+    }
     .review {
         background-color: #f9f9f9;
     }
@@ -53,91 +76,88 @@
     
     .review small {
         color: #888;
-    }</style>
-<body>
-    <script>
-        document.getElementById('menuIcon').addEventListener('click', function() {
-            var nav = document.querySelector('.navbar-nav');
-            nav.classList.toggle('active');
-        });
-
-        document.querySelector('.dropdown-button').addEventListener('click', function() {
-            const dropdownContent = document.querySelector('.dropdown-content');
-            dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.read-more-btn').forEach(button => {
-              button.addEventListener('click', () => {
-                const cardText = button.previousElementSibling; // Get the previous sibling <p> element
-                const moreText = cardText.querySelector('.more-text');
-                
-                if (moreText) {
-                  const isHidden = moreText.style.display === 'none';
-                  moreText.style.display = isHidden ? 'inline' : 'none';
-                  button.textContent = isHidden ? 'Read Less' : 'Read More';
-                }
-              });
+    }
+    </style>
+    
+    
+    </head>
+    <body>
+        <script>
+            document.getElementById('menuIcon').addEventListener('click', function() {
+                var nav = document.querySelector('.navbar-nav');
+                nav.classList.toggle('active');
             });
-          });
-          
-          
-          
-        
-    </script>
-
+    
+            document.querySelector('.dropdown-button').addEventListener('click', function() {
+                const dropdownContent = document.querySelector('.dropdown-content');
+                dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+            });
+    
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.read-more-btn').forEach(button => {
+                  button.addEventListener('click', () => {
+                    const cardText = button.previousElementSibling; // Get the previous sibling <p> element
+                    const moreText = cardText.querySelector('.more-text');
+                    
+                    if (moreText) {
+                      const isHidden = moreText.style.display === 'none';
+                      moreText.style.display = isHidden ? 'inline' : 'none';
+                      button.textContent = isHidden ? 'Read Less' : 'Read More';
+                    }
+                  });
+                });
+              });
+              
+              
+              
+            
+        </script>
+</head>
+<body>
     <!-- Navigation Bar -->
-   
-    <nav class="navbar navbar-expand-lg  custom-navbar">
-        <div class="container-fluid d-flex justify-content-between align-items-center">
-            <!-- Logo Section -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary custom-navbar">
+        <div class="container-fluid">
             <a class="navbar-brand" href="#">
-                <img src="{% static 'Logo.png' %}" alt="Logo" width="100" height="114" class="d-inline-block align-text-top">
-                <span class="ms-2">Time Community Bank</span>
+                <img src="{% static 'Logo.png' %}" alt="Logo" width="80" height="80" class="d-inline-block align-text-top">
+                <span>Time Community Bank</span>
             </a>
-    
-            <!-- Navigation Links -->
-            <ul class="navbar-nav d-flex">
-                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"> <i class="fas fa-home"></i><br>Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'service_list' %}"><i class="fas fa-concierge-bell"></i><br>Services</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}"> <i class="fas fa-cogs"></i><br>Admin Panel</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'request_list' %}?category=Request"><i class="fas fa-clipboard-list"></i><br>Requests</a></li>
-                
-                <!-- Dropdown for Booking Service -->
-                <li class="nav-item text-center dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-book"></i><br>Book Service
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'book_service' service_id=1 %}">Book Service</a></li>
-                        <li><a class="dropdown-item" href="{% url 'calendar' %}">Book Calendar</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Link 3</a></li>
-                    </ul>
-                </li>
-    
-                <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}"><i class="fas fa-info-circle"></i><br>About Us</a></li>
-                <li class="nav-item"><a class="nav-link" href="#contact"><i class="fas fa-envelope"></i><br>Contact</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'all_reviews' %}"><i class="fas fa-comments"></i><br>Reviews</a></li>
-    
-                <li class="nav-item text-center dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user"></i><br>Account
-                    </a>
-                    <ul class="dropdown-menu">
-                        {% if user.is_authenticated %}
-                            <li><a class="dropdown-item" href="{% url 'dashboard' %}">Dashboard</a></li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-                        {% else %}
-                            <li><a class="dropdown-item" href="{% url 'login' %}">Login</a></li>
-                            <li><a class="dropdown-item" href="{% url 'register' %}">Register</a></li>
-                        {% endif %}
-                    </ul>
-                </li>
-    
-                <!-- Menu Icon (for mobile view) -->
-                <a href="javascript:void(0);" id="menuIcon" class="icon">&#9776;</a>
-            </ul>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="home.html" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto text-center">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'service_list' %}"><i class="fas fa-concierge-bell"></i> Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}"><i class="fas fa-cogs"></i> Admin Panel</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'request_list' %}?category=Request"><i class="fas fa-clipboard-list"></i> Requests</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-book"></i> Book Service
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'book_service' service_id=1 %}">Book Service</a></li>
+                            <li><a class="dropdown-item" href="{% url 'calendar' %}">Book Calendar</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}"><i class="fas fa-info-circle"></i> About Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'all_reviews' %}"><i class="fas fa-comments"></i> Reviews</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i> Account
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% if user.is_authenticated %}
+                                <li><a class="dropdown-item" href="{% url 'dashboard' %}">Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                            {% else %}
+                                <li><a class="dropdown-item" href="{% url 'login' %}">Login</a></li>
+                                <li><a class="dropdown-item" href="{% url 'register' %}">Register</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
     <div class="container my-5">
@@ -181,6 +201,7 @@
         </ul>
     {% endif %}
 
+
         <div class="mt-5">
             <h2>Reviews</h2>
             {% for review in reviews %}
@@ -194,6 +215,8 @@
             {% endfor %}
             <a href="{% url 'add_review' service.id %}" class="btn btn-primary mt-3">Leave a Review</a>
         </div>
+        <a href="{% url 'service_list' %}" class="btn btn-primary mt-3">Back to services</a>
+
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>

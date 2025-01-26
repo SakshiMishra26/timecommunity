@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile</title>
+</head>
+<body>
+    <h2>Your Profile</h2>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    
+    {% if user_location %}
+        <p><strong>Location:</strong> {{ user_location.city }}, {{ user_location.state }}, {{ user_location.country }}</p>
+    {% else %}
+        <p><strong>Location:</strong> Not provided</p>
+    {% endif %}
+
+    <a href="{% url 'update_location' %}">Update Location</a>
+</body>
+</html>

@@ -7,225 +7,283 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Service List</title>
     <link rel="stylesheet" href="{% static 'home.css' %}">
+    <link rel="stylesheet" href="{%static 'abc.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<style>
-    /* Custom Styles for Navbar */
-.custom-navbar .navbar-brand {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color:white;
-}
+    <style>
+        /* Custom Styles for Navbar */
+    .custom-navbar {
+        background-color:#2a6d56 !important; /* Changed navbar background color to green */
+    }
 
-.custom-navbar .nav-link {
-    color: white !important; /* Overriding default navbar link color */
-}
-
-.custom-navbar .nav-link:hover {
-    color: orange !important; /* Overriding default hover color */
-}
-
-/* Navbar on mobile */
-.custom-navbar .navbar-toggler {
-    background-color: whte;
-}
-</style>
-
-
+    .custom-navbar .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color:white;
+    }
+    
+    .custom-navbar .nav-link {
+        color: white !important; /* Overriding default navbar link color */
+    }
+    
+    .custom-navbar .nav-link:hover {
+        color: orange !important; /* Overriding default hover color */
+    }
+    
+    /* Navbar on mobile */
+    .custom-navbar .navbar-toggler {
+        background-color: black;
+    }
+    </style>
+    
+    
+    </head>
+    <body>
+        <script>
+            document.getElementById('menuIcon').addEventListener('click', function() {
+                var nav = document.querySelector('.navbar-nav');
+                nav.classList.toggle('active');
+            });
+    
+            document.querySelector('.dropdown-button').addEventListener('click', function() {
+                const dropdownContent = document.querySelector('.dropdown-content');
+                dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+            });
+    
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.read-more-btn').forEach(button => {
+                  button.addEventListener('click', () => {
+                    const cardText = button.previousElementSibling; // Get the previous sibling <p> element
+                    const moreText = cardText.querySelector('.more-text');
+                    
+                    if (moreText) {
+                      const isHidden = moreText.style.display === 'none';
+                      moreText.style.display = isHidden ? 'inline' : 'none';
+                      button.textContent = isHidden ? 'Read Less' : 'Read More';
+                    }
+                  });
+                });
+              });
+              
+              
+              
+            
+        </script>
 </head>
 <body>
-    <script>
-        document.getElementById('menuIcon').addEventListener('click', function() {
-            var nav = document.querySelector('.navbar-nav');
-            nav.classList.toggle('active');
-        });
-
-        document.querySelector('.dropdown-button').addEventListener('click', function() {
-            const dropdownContent = document.querySelector('.dropdown-content');
-            dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.read-more-btn').forEach(button => {
-              button.addEventListener('click', () => {
-                const cardText = button.previousElementSibling; // Get the previous sibling <p> element
-                const moreText = cardText.querySelector('.more-text');
-                
-                if (moreText) {
-                  const isHidden = moreText.style.display === 'none';
-                  moreText.style.display = isHidden ? 'inline' : 'none';
-                  button.textContent = isHidden ? 'Read Less' : 'Read More';
-                }
-              });
-            });
-          });
-          
-          
-          
-        
-    </script>
-
     <!-- Navigation Bar -->
-   
-    <nav class="navbar navbar-expand-lg  custom-navbar">
-        <div class="container-fluid d-flex justify-content-between align-items-center">
-            <!-- Logo Section -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary custom-navbar">
+        <div class="container-fluid">
             <a class="navbar-brand" href="#">
-                <img src="{% static 'Logo.png' %}" alt="Logo" width="100" height="114" class="d-inline-block align-text-top">
-                <span class="ms-2">Time Community Bank</span>
+                <img src="{% static 'Logo.png' %}" alt="Logo" width="80" height="80" class="d-inline-block align-text-top">
+                <span>Time Community Bank</span>
             </a>
-    
-            <!-- Navigation Links -->
-            <ul class="navbar-nav d-flex">
-                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"> <i class="fas fa-home"></i><br>Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'service_list' %}"><i class="fas fa-concierge-bell"></i><br>Services</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}"> <i class="fas fa-cogs"></i><br>Admin Panel</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'request_list' %}?category=Request"><i class="fas fa-clipboard-list"></i><br>Requests</a></li>
-                
-                <!-- Dropdown for Booking Service -->
-                <li class="nav-item text-center dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-book"></i><br>Book Service
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'book_service' service_id=1 %}">Book Service</a></li>
-                        <li><a class="dropdown-item" href="{% url 'calendar' %}">Book Calendar</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Link 3</a></li>
-                    </ul>
-                </li>
-    
-                <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}"><i class="fas fa-info-circle"></i><br>About Us</a></li>
-                <li class="nav-item"><a class="nav-link" href="#contact"><i class="fas fa-envelope"></i><br>Contact</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'all_reviews' %}"><i class="fas fa-comments"></i><br>Reviews</a></li>
-    
-                <li class="nav-item text-center dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user"></i><br>Account
-                    </a>
-                    <ul class="dropdown-menu">
-                        {% if user.is_authenticated %}
-                            <li><a class="dropdown-item" href="{% url 'dashboard' %}">Dashboard</a></li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-                        {% else %}
-                            <li><a class="dropdown-item" href="{% url 'login' %}">Login</a></li>
-                            <li><a class="dropdown-item" href="{% url 'register' %}">Register</a></li>
-                        {% endif %}
-                    </ul>
-                </li>
-    
-                <!-- Menu Icon (for mobile view) -->
-                <a href="javascript:void(0);" id="menuIcon" class="icon">&#9776;</a>
-            </ul>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="home.html" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto text-center">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'service_list' %}"><i class="fas fa-concierge-bell"></i> Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}"><i class="fas fa-cogs"></i> Admin Panel</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'request_list' %}?category=Request"><i class="fas fa-clipboard-list"></i> Requests</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-book"></i> Book Service
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'book_service' service_id=1 %}">Book Service</a></li>
+                            <li><a class="dropdown-item" href="{% url 'calendar' %}">Book Calendar</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}"><i class="fas fa-info-circle"></i> About Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'all_reviews' %}"><i class="fas fa-comments"></i> Reviews</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i> Account
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% if user.is_authenticated %}
+                                <li><a class="dropdown-item" href="{% url 'dashboard' %}">Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                            {% else %}
+                                <li><a class="dropdown-item" href="{% url 'login' %}">Login</a></li>
+                                <li><a class="dropdown-item" href="{% url 'register' %}">Register</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
+
     
-    <div class="main">
+    <div class="main text-center py-5">
         <h1>Our Services</h1>
         <p>Details about services provided.</p>
     </div>
-    <section id="offers" class="container my-5">
-    <h2 class="text-center">Welcome to Service Community</h2>
-    <p class="text-center"></p>
-    <div class="row">
-    {% for service in services %}
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body">
-        {% comment %} <div class="service"> {% endcomment %}
-            <h5 class="card-title">{{ service.title }}</h5>
-            <p class="card-text">
-                {{ service.description|truncatewords:20 }}
-                <span class="more-text" style="display: none;">{{ service.description|slice:21 }}</span>
-            </p>
-            {% comment %} <button class="btn btn-link read-more-btn">Read More</button> {% endcomment %}
-            <a href="{% url 'service_detail' service.id %}" class="btn btn-primary" >View Details</a>
-        </div>
-    </div>
-</div>
-
-    {% empty %}
-        <p class="text-center">No services available at the moment. Please check back later.</p>
-    {% endfor %}
-</div>
-</section>
-
-
-
-    <h2>Available Services</h2>
     
-    <!-- Category Filter -->
-    {% comment %} <form method="get" style="margin-bottom: 20px;">
-        <select name="category">
-            <option value="">All Categories</option>
-            <option value="Babysitting">Babysitting</option>
-            <option value="Gardening">Gardening</option>
-            <option value="Tutoring">Tutoring</option>
-            <option value="Other">Other</option>
-        </select>
-        <button type="submit">Filter</button>
-    </form> {% endcomment %}
-
-    <!-- Service List -->
-    <ul> 
-        {% for service in services %}
-            <li>{{ service.title }} - {{ service.category }} - {{ service.hours_offered }} hours</li>
-        {% endfor %}
-    </ul>
-
-      <!-- Add a Service Button & Edit Service Buttons -->
-
-   
-    <div class="d-flex justify-content-start mb-3">
-        <a href="{% url 'add_service' %}" method="get" class="btn btn-primary">Add a Service</a>
-            {% comment %} <button type="submit" class="btn btn-primary">Add a Service</button>
-        </form> {% endcomment %}
-    </div>
-
-    <!-- Services List -->
-    <section id="offers" class="container my-5">
-        <h2 class="text-center">Services</h2>
-        <p class="text-center">Here you can Edit your service.</p>
-    {% comment %} <div class="service-list"> {% endcomment %}
-     <div class="row">
-        {% for service in services %}
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-body">
-            {% comment %} <div class="service-item">
-                <!-- Service Details (above the buttons) -->
-                <div class="service-details"> {% endcomment %}
-                    <h3 class="card-title">{{ service.title }}</h3>
-                    <p class="card-text">{{ service.description|truncatewords:20 }}
-                        <span class="more-text" style="display: none;">{{ service.description|slice:21 }}</span></p>
-                    <p class="card-text">Category: <strong>{{ service.category }}</strong></p>
-                    <p class="card-text">Hours Offered: <strong>{{ service.hours_offered }} hours</strong></p>
-                    <a href="{% url 'edit_service' service_id=service.id %}" method="get" class="btn btn-primary">Edit</a>
-                    <a href="{% url 'delete_service' service.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this service?')">Delete</a>
-
+     <section id="offers" class="container my-5">
+        <h2 class="text-center">Welcome to Service Community</h2>
+        <p class="text-center">Explore the services we offer.</p>
+        <div class="row g-4">
+            {% for service in approved_services %}
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ service.title }}</h5>
+                        <p class="card-text">
+                            {{ service.description|truncatewords:20 }}
+                            <span class="more-text d-none">{{ service.description|slice:21 }}</span>
+                        </p>
+                        <div class="d-flex justify-content-center">
+                            <a href="{% url 'service_detail' service.id %}" class="btn btn-primary btn-sm" style="width: 100px;">View Details</a>
+                        </div>                    </div>
                 </div>
+            </div>
+            {% empty %}
+            <div class="text-center">
+                <p class="text-muted">No services available at the moment. Please check back later.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section> 
 
-                <!-- Edit Service Button -->
-                {% comment %} <form action="{% url 'edit_service' service_id=service.id %}" method="get">
-                    <button type="submit" class="btn btn-primary">Edit</button>
-                </form> {% endcomment %}
+    
+    <div class="container">
+        <!-- Service List (Pending Requests) Section -->
+        <section>
+            <h2 class="text-center">Service List (Pending Requests)</h2>
+            <p class="text-center">Here you can approve or reject pending service requests.</p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Service Title</th>
+                        <th>User</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in pending_services %}
+                        <tr>
+                            <td>{{ service.title }}</td>
+                            <td>{{ service.user.username }}</td>
+                            <td>{{ service.price }}</td>
+                            <td>
+                                <span class="badge bg-warning">Pending</span>
+                            </td>
+                            <td>
+                                {% if user.is_superuser %}
+                                    <!-- Show moderation actions only for superusers -->
+                                    <a href="{% url 'approve_service' service.id %}" class="btn btn-success btn-sm">Approve</a>
+                                    <a href="{% url 'reject_service' service.id %}" class="btn btn-danger btn-sm">Reject</a>
+                                {% else %}
+                                    <span class="text-muted">Restricted to admins</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5" class="text-center">No pending services.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    
+
+    </div>
+    
+
+<section class="container my-5">
+        <h2 class="text-center">Available Services</h2>
+    
+        <!-- Service List -->
+        <ul class="list-group list-group-flush">
+            {% for service in services %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ service.title }} - {{ service.category }} - {{ service.hours_offered }} hours</span>
+            </li>
+            {% endfor %}
+        </ul>
+    
+        <!-- Add Service Button -->
+        <div class="text-center my-4">
+            <a href="{% url 'add_service' %}" class="btn btn-success">Add a Service</a>
+        </div>
+    </section>
+    
+    <section id="offers" class="container my-5">
+        <h2 class="text-center">Manage Your Services</h2>
+        <p class="text-center">Here you can edit or delete your services.</p>
+        <div class="row g-4">
+            {% for service in services %}
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h3 class="card-title">{{ service.title }}</h3>
+                        <p class="card-text">{{ service.description|truncatewords:20 }}</p>
+                        <p class="card-text">Category: <strong>{{ service.category }}</strong></p>
+                        <p class="card-text">Hours Offered: <strong>{{ service.hours_offered }} hours</strong></p>
+                        <p class="card-text"> Offered by: <strong>{{ service.user.username}} </strong></p>
+
+                        <div class="mt-auto">
+                            <a href="{% url 'edit_service' service_id=service.id %}" class="btn btn-primary me-2">Edit</a>
+                            <a href="{% url 'delete_service' service.id %}" class="btn btn-danger"
+                               onclick="return confirm('Are you sure you want to delete this service?')">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    
+    <!-- Footer -->
+     <!-- Footer -->
+     <footer class="footer">
+        <div class="container">
+            <div class="footer-row">
+                <!-- Contact Information -->
+                <div class="footer-column">
+                    <h4>Contact Us</h4>
+                    <p>Email: example@email.com</p>
+                    <p>Phone: +1 234 567 890</p>
+                    <p>Address: 123 Main Street, City, Country</p>
+                </div>
+    
+                <!-- Social Media Links -->
+                <div class="footer-column">
+                    <h4>Follow Us</h4>
+                    <div class="social-links">
+                        <a href="https://www.instagram.com" target="_blank" class="social-icon">
+                            <i class="fab fa-instagram"></i> Instagram
+                        </a>
+                        <a href="https://www.facebook.com" target="_blank" class="social-icon">
+                            <i class="fab fa-facebook"></i> Facebook
+                        </a>
+                        <a href="https://www.twitter.com" target="_blank" class="social-icon">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </a>
+                    </div>
+                </div>
+    
+                <!-- About Section -->
+                <div class="footer-column">
+                    <h4>About Us</h4>
+                    <p>
+                        We are a community-driven platform focused on sharing time, skills, and resources. Join us and be a part of something meaningful!
+                    </p>
+                </div>
             </div>
         </div>
-        {% endfor %}
-    </div>
-</section>
-
-
-
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 Time Community. All rights reserved.</p>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Time Community Bank. All rights reserved.</p>
+        </div>
     </footer>
-
     
-
 {% comment %} <script src="{% static 'script.js' %}"></script> {% endcomment %}
 </body>
 </html>

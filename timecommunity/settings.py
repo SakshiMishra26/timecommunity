@@ -139,9 +139,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/' 
 
 
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp.gmail.com'  # For Gmail SMTP server
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'sakshisanjaymishra26@gmail.com'  # your email
-EMAIL_HOST_PASSWORD = 'lwzk bgsx ldko qkau'  # your email password
+EMAIL_HOST_USER = 'sakshisanjaymishra26@gmail.com'  # Replace with your email address
+EMAIL_HOST_PASSWORD = 'elwu bpxn vloh uwbd' 
+
+
+# CSRF_COOKIE_SECURE = False  # Set to True for production when using HTTPS
+# CSRF_COOKIE_HTTPONLY = False  # Default False, if you don't need to limit cookie access
+# CSRF_COOKIE_SAMESITE = 'Lax' 
+
+# CSRF_FAILURE_VIEW = 'demo.views.custom_csrf_failure'

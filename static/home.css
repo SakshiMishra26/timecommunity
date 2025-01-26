@@ -61,23 +61,21 @@ ul li {
     list-style: none;
 }
 
-.navbar {
+/* .navbar {
     background-color: #2a6d56;
-    ;
-    /* Light grey background */
+    
     padding: 10px 20px;
     border-bottom: 1px solid #dee2e6;
-}
+} */
 
-.navbar-brand {
+/* .navbar-brand {
     display: flex;
     align-items: center;
     font-size: 1.25rem;
     font-weight: bold;
-    /* color: #333; */
     color: white;
     text-decoration: none;
-}
+} */
 
 .navbar-brand img {
     margin-right: 10px;
@@ -95,8 +93,7 @@ ul li {
     margin: 0 10px;
 }
 
-.nav-link {
-    /* color: #333; */
+/* .nav-link {
     color: white;
     text-decoration: none;
     padding: 10px 15px;
@@ -105,6 +102,29 @@ ul li {
 
 .nav-link:hover {
     color: rgb(239, 136, 47);
+} */
+
+/* Navbar Styles */
+.navbar {
+    background-color: #007bff !important; /* Reset navbar background color to blue */
+}
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.nav-link {
+    color: white !important; /* Overriding default navbar link color */
+}
+
+.nav-link:hover {
+    color: orange !important; /* Overriding default hover color */
+}
+
+/* Navbar on mobile */
+.navbar-toggler {
+    background-color: white;
 }
 
 
@@ -253,6 +273,7 @@ footer {
     bottom: 0;
     width: 100%;
 }
+ 
 
 
 /* Icons */

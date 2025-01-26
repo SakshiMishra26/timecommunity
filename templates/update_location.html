@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Location</title>
+</head>
+<body>
+    <h2>Update Your Location</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="latitude" placeholder="Latitude" required>
+        <input type="text" name="longitude" placeholder="Longitude" required>
+        <input type="hidden" name="request_id" value="{{ request_id }}">  <!-- Add request_id as hidden input -->
+        <button type="submit">Update Location</button>
+    </form>
+    
+</body>
+</html>

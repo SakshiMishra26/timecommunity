@@ -16,13 +16,6 @@
 
     <main>
         <main>
-            {% comment %} <section>
-                
-                <h2>Service Details</h2>
-               <p><strong>Service Title:</strong> {% if time_credit.service %}{{ time_credit.service.title }}{% else %}No service available{% endif %}</p>
-               <p><strong>Description:</strong> {% if time_credit.service %}{{ time_credit.service.description }}{% else %}No description available{% endif %}</p>
-                <p><strong>Hours Available:</strong> {{ time_credit.hours_available }}</p>
-            </section> {% endcomment %}
         
             <section>
                 <h3>Log Hours for {{ service.title }}</h3>
@@ -39,16 +32,6 @@
             </section>
 
            
-
-            {% comment %} <form method="POST">
-                {% csrf_token %}
-                {{ form.as_p }}
-                {% if error %}
-                    <p style="color: red;">{{ error }}</p>
-                {% endif %}
-                <button type="submit">Log Hours</button>
-            </form> {% endcomment %}
-       
         
     </main>
 
