@@ -90,19 +90,9 @@
             <ul class="navbar-nav ms-auto text-center">
                 <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'service_list' %}"><i class="fas fa-concierge-bell"></i> Services</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}"><i class="fas fa-cogs"></i> Admin Panel</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'request_list' %}?category=Request"><i class="fas fa-clipboard-list"></i> Requests</a></li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-book"></i> Book Service
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'book_service' service_id=1 %}">Book Service</a></li>
-                        <li><a class="dropdown-item" href="{% url 'calendar' %}">Book Calendar</a></li>
-                    </ul>
-                </li>
+                
                 <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}"><i class="fas fa-info-circle"></i> About Us</a></li>
-                <li class="nav-item"><a class="nav-link" href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'all_reviews' %}"><i class="fas fa-comments"></i> Reviews</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -188,7 +178,24 @@ logger.info(f"POST data: {request.POST}") {% endcomment %}
     {% endif %}
     
     <a href="{% url 'request_list' %}" class="btn btn-secondary">Back to Requests</a>
+
+    {% if request.user == user %} 
+    {% if not request.is_completed %}
+    {% if not request.is_approved%}
+    <span style="color: red;"> This request is not being accepted yet so you cannot mark it as completed</span>
+        <form method="POST" action="{% url 'complete_service_request' request.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Mark as Completed</button>
+        </form>
+    {% else %}
+        <p>This request has already been completed.</p>
+    {% endif %}
+    {% endif %}
+
+{% endif %}
 </div>
+<p>Requester: {{ request.user }}</p>
+<p>Current User: {{ user }}</p>
 
 
 </div>

@@ -56,19 +56,9 @@
                 <ul class="navbar-nav ms-auto text-center">
                     <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'service_list' %}"><i class="fas fa-concierge-bell"></i> Services</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}"><i class="fas fa-cogs"></i> Admin Panel</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'request_list' %}?category=Request"><i class="fas fa-clipboard-list"></i> Requests</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-book"></i> Book Service
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'book_service' service_id=1 %}">Book Service</a></li>
-                            <li><a class="dropdown-item" href="{% url 'calendar' %}">Book Calendar</a></li>
-                        </ul>
-                    </li>
+                   
                     <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}"><i class="fas fa-info-circle"></i> About Us</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'all_reviews' %}"><i class="fas fa-comments"></i> Reviews</a></li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

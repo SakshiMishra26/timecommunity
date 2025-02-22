@@ -86,43 +86,72 @@ def home(request):
 def index(request):
     return render(request, 'index.html')
 
+# def register(request):
+#     if request.method == 'POST':
+#         form = RegisterForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             username = form.cleaned_data.get('username')
+#             password = form.cleaned_data.get('password1')
+#             user = authenticate(username=username, password=password)
+#             login(request, user)
+#             return redirect('home.html')
+#     else:
+#         form = RegisterForm()
+#     return render(request, 'register.html', {'form': form})
+
+from django.contrib.auth.models import User
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            form.save()
+            email = form.cleaned_data.get('email')
             username = form.cleaned_data.get('username')
+
+            # ✅ Check if the email already exists
+            if User.objects.filter(email=email).exists():
+                messages.error(request, "This email is already registered. Please use a different one.")
+                return render(request, 'register.html', {'form': form})
+
+            # ✅ Check if the username already exists
+            if User.objects.filter(username=username).exists():
+                messages.error(request, "This username is already taken. Please choose another one.")
+                return render(request, 'register.html', {'form': form})
+
+            # ✅ Create user
+            user = form.save()
+
+            # ✅ Ensure TimeCredit is created for the user
+            time_credit, created = TimeCredit.objects.get_or_create(user=user, defaults={'balance': Decimal('2.00')})
+            if created:
+                time_credit.save()
+
+            # ✅ Authenticate and log in the user
             password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=password)
             login(request, user)
-            return redirect('home.html')
+
+            # ✅ Send welcome notification
+            Notification.objects.create(
+                recipient=user,
+                message="Welcome to Time Credit! You have received 2 free credits to start."
+            )
+
+            # ✅ Send welcome email
+            send_mail(
+                "Welcome to Time Credit",
+                f"Hello {user.username},\n\nYou have successfully registered and received 2 time credits to start.",
+                settings.EMAIL_HOST_USER,
+                [user.email],
+                fail_silently=False,
+            )
+
+            messages.success(request, "Registration successful! You received 2 free credits.")
+            return redirect('dashboard')  # ✅ Redirect to dashboard
     else:
         form = RegisterForm()
+    
     return render(request, 'register.html', {'form': form})
-
-# from django.urls import reverse
-# from .forms import CustomRegistrationForm
-
-# def register(request):
-#     if request.method == 'POST':
-#         form = CustomRegistrationForm(request.POST)
-#         if form.is_valid():
-#             # Create a new user object
-#             user = form.save(commit=False)
-#             user.set_password(form.cleaned_data['password'])
-#             user.save()
-
-#             # Optionally log the user in after registration
-#             login(request, user)
-
-#             # Redirect to the default login redirect page
-#             return redirect(reverse('login'))  # Replace 'login' with the name of your desired page
-#     else:
-#         form = CustomRegistrationForm()
-
-#     return render(request, 'register.html', {'form': form})
-
-# from .models import UserProfile
 
 def login_view(request):
     # user = request.user
@@ -141,46 +170,6 @@ def login_view(request):
     else:
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
-# from django.views.decorators.csrf import csrf_exempt
-
-# def login_view(request):
-#     if request.method == 'POST':
-#         form = AuthenticationForm(request, data=request.POST)
-#         if form.is_valid():
-#             username = form.cleaned_data.get('username')
-#             password = form.cleaned_data.get('password')
-#             user = authenticate(username=username, password=password)
-#             if user is not None:
-#                 login(request, user)
-
-#                 # Check if the user has a UserProfile
-#                 try:
-#                     user_profile = user.userprofile
-#                 except ObjectDoesNotExist:
-#                     user_profile = None
-
-#                 if user_profile is None:
-#                     # Create a UserProfile for the user
-#                     user_profile = UserProfile.objects.create(user=user)
-                    
-#                 return redirect('dashboard')  # Redirect to the index page or dashboard
-#         else:
-#             form.add_error(None, 'Invalid username or password')
-
-#     else:
-#         form = AuthenticationForm()
-
-#     return render(request, 'login.html', {'form': form})
-
-# def test_csrf_view(request):
-#     if request.method == 'POST':
-#         return render(request, 'test_csrf_success.html')
-#     return render(request, 'test_csrf_form.html')
-
-# from django.http import HttpResponseForbidden
-
-# def custom_csrf_failure(request, reason=""):
-#     return HttpResponseForbidden(f"CSRF Failed: {reason}")
 
 
 def logout_view(request):
@@ -192,86 +181,275 @@ def logout_view(request):
 
 
 
+from .models import ServiceLog
+from django.db import models  
+
+# @login_required
+# def dashboard(request):
+#     user = request.user
+
+    
+#     try:
+        
+#         time_credit, _ = TimeCredit.objects.get_or_create(user=user)
+
+#     except TimeCredit.DoesNotExist:
+#         time_credit = None
+
+    
+#     accepted_requests = ServiceRequest.objects.filter(accepted=True, accepted_by=user)
+
+#     pending_credit_requests = ServiceRequest.objects.filter(user=user, credit_requested=True, is_approved=False)
+#     completed_services = ServiceRequest.objects.filter(accepted_by=user, is_completed=True, credit_requested=False)
+
+#     transactions = Transaction.objects.filter(models.Q(sender=user) | models.Q(receiver=user)).order_by('-date')
+
+#     service_logs = ServiceLog.objects.filter(request__user=request.user)
+
+#     request_list = ServiceRequest.objects.filter(user=user)
+
+#     services = Service.objects.filter(user=user)
+#     unread_notifications = user.notifications.filter(is_read=False)
 
 
+   
+
+#     return render(request, 'dashboard.html', {
+#         'user': user,
+#         'time_credit': time_credit,
+#         'request_list': request_list,
+
+#         'transactions': transactions,
+#         'services': services,
+#         'accepted_requests': accepted_requests, 
+#         'unread_notifications': unread_notifications,
+#         'service_logs': service_logs,
+#         'pending_credit_requests': pending_credit_requests,
+#         'completed_services': completed_services,
+
+ 
+#     })
 @login_required
 def dashboard(request):
     user = request.user
-    # user_profile = request.user.userprofile
 
-    
-    # Fetch the TimeCredit object for the logged-in user
-    try:
-        time_credit = TimeCredit.objects.get(user=user)
-    except TimeCredit.DoesNotExist:
-        time_credit = None
+    # ✅ Ensure the user has a TimeCredit account (Starts with 2 credits if new)
+    time_credit, created = TimeCredit.objects.get_or_create(user=user, defaults={'balance': Decimal('2.00')})
 
-    # Fetch transactions for the user
-    transactions = TimeTransaction.objects.filter(user=user)
+    # ✅ If the user was created before this feature, update balance if it's missing
+    if created or time_credit.balance is None:
+        time_credit.balance = Decimal('2.00')
+        time_credit.save()
 
-    # Fetch services offered by the user
+    # ✅ Fetch all necessary data for the dashboard
+    accepted_requests = ServiceRequest.objects.filter(accepted=True, accepted_by=user)
+    pending_credit_requests = ServiceRequest.objects.filter(user=user, credit_requested=True, is_approved=False)
+    completed_services = ServiceRequest.objects.filter(accepted_by=user, is_completed=True, credit_requested=False)
+    transactions = Transaction.objects.filter(models.Q(sender=user) | models.Q(receiver=user)).order_by('-date')
+    service_logs = ServiceLog.objects.filter(request__user=request.user)
+    request_list = ServiceRequest.objects.filter(user=user)
     services = Service.objects.filter(user=user)
-    unread_notifications = user.notifications.filter(is_read=False)
+    unread_notifications = Notification.objects.filter(recipient=user, is_read=False)
 
-
-    # Fetch service requests accepted by the user
-    # accepted_requests = ServiceRequest.objects.filter(accepted_by=user)
-    # accepted_requests = ServiceRequest.objects.filter(accepted_by=None).exclude(user=user)
-    accepted_requests = ServiceRequest.objects.filter(accepted=True, accepted_by=request.user)
-
-    
-
-
+    # ✅ Pass data to the dashboard template
     return render(request, 'dashboard.html', {
         'user': user,
-        # 'user_profile': user_profile,
-        'time_credits': request.user,
+        'time_credit': time_credit,  # ✅ Ensure balance is displayed
+        'request_list': request_list,
         'transactions': transactions,
         'services': services,
         'accepted_requests': accepted_requests, 
         'unread_notifications': unread_notifications,
- 
+        'service_logs': service_logs,
+        'pending_credit_requests': pending_credit_requests,
+        'completed_services': completed_services,
     })
 
+@login_required
+def request_time_credit(request, request_id):
+    service_request = get_object_or_404(ServiceRequest, id=request_id)
 
+    # Ensure only the worker can request credit
+    if service_request.accepted_by != request.user:
+        messages.error(request, "You can only request time credits for services you completed.")
+        return redirect('dashboard')
 
-# from django.core.exceptions import ObjectDoesNotExist
+    if service_request.credit_requested:
+        messages.warning(request, "You have already requested time credits for this service.")
+        return redirect('dashboard')
+
+    # Mark the request as "credit requested"
+    service_request.credit_requested = True
+    service_request.save()
+
+    # Notify the requester
+    Notification.objects.create(
+        recipient=service_request.user,
+        message=f"{request.user.username} has requested {service_request.credit_amount} time credits for completing '{service_request.title}'."
+    )
+
+    # Send email notification
+    send_mail(
+        "Time Credit Request",
+        f"Hello {service_request.user.username},\n\n{request.user.username} has requested {service_request.credit_amount} time credits for completing '{service_request.title}'. Please approve it from your dashboard.\n\nTime Community Bank",
+        settings.EMAIL_HOST_USER,
+        [service_request.user.email],
+        fail_silently=False,
+    )
+
+    messages.success(request, "Your time credit request has been sent.")
+    return redirect('dashboard')
+
+@login_required
+def approve_time_credit(request, request_id):
+    service_request = get_object_or_404(ServiceRequest, id=request_id)
+
+    if service_request.user != request.user:
+        messages.error(request, "You can only approve credits for services you requested.")
+        return redirect('dashboard')
+
+    if not service_request.credit_requested:
+        messages.warning(request, "The worker has not requested time credits for this service yet.")
+        return redirect('dashboard')
+
+    if service_request.is_approved:
+        messages.warning(request, "This request has already been approved.")
+        return redirect('dashboard')
+
+    sender = request.user  # The one giving the credit
+    receiver = service_request.accepted_by  # The one receiving the credit
+    hours = service_request.credit_amount
+
+    sender_credit = TimeCredit.objects.get(user=sender)
+    receiver_credit = TimeCredit.objects.get(user=receiver)
+
+    # ✅ Ensure the sender has enough balance
+    if sender_credit.balance < hours:
+        messages.error(request, "Insufficient balance to complete this transaction.")
+        return redirect('dashboard')
+
+    # ✅ Deduct and add credits
+    sender_credit.balance -= hours
+    receiver_credit.balance += hours
+    sender_credit.save()
+    receiver_credit.save()
+
+    # ✅ Mark request as approved
+    service_request.is_approved = True
+    service_request.save()
+
+    # ✅ Notify the receiver
+    Notification.objects.create(
+        recipient=receiver,
+        message=f"You received {hours} time credits from {sender.username} for '{service_request.title}'."
+    )
+
+    # ✅ Send email notifications
+    send_mail(
+        "Time Credit Received",
+        f"Hello {receiver.username},\n\nYou received {hours} time credits from {sender.username}.",
+        settings.EMAIL_HOST_USER,
+        [receiver.email],
+        fail_silently=False,
+    )
+
+    send_mail(
+        "Time Credit Sent",
+        f"Hello {sender.username},\n\nYou sent {hours} time credits to {receiver.username}.",
+        settings.EMAIL_HOST_USER,
+        [sender.email],
+        fail_silently=False,
+    )
+
+    messages.success(request, f"{hours} hours transferred to {receiver.username}.")
+    return redirect('dashboard')
+
 
 # @login_required
-# def dashboard(request):
-#     # Fetch the user profile
-#     try:
-#         user_profile = request.user.userprofile
-#     except ObjectDoesNotExist:
-#         user_profile = None
+# def approve_time_credit(request, request_id):
+    service_request = get_object_or_404(ServiceRequest, id=request_id)
 
-#     services = Service.objects.filter(user=user_profile)
+    # Ensure only the original requester can approve the credit transfer
+    if service_request.user != request.user:
+        messages.error(request, "You can only approve credits for services you requested.")
+        return redirect('dashboard')
 
-#     # Fetch TimeCredit transactions where the user is either the giver or receiver
-#     time_credits_given = TimeCredit.objects.filter(giver=request.user)
-#     time_credits_received = TimeCredit.objects.filter(receiver=request.user)
+    if not service_request.credit_requested:
+        messages.warning(request, "The worker has not requested time credits for this service yet.")
+        return redirect('dashboard')
 
-#     # Fetch transactions for the user
-#     transactions = TimeTransaction.objects.filter(user=user_profile)
+    if service_request.is_approved:
+        messages.warning(request, "This request has already been approved.")
+        return redirect('dashboard')
 
-#     # Fetch services offered by the user
-#     print(f"Services in view: {services}")
+    sender = request.user  # The one giving the credit
+    receiver = service_request.accepted_by  # The one receiving the credit
 
-#     # Fetch unread notifications for the user
-#     unread_notifications = user_profile.notifications.filter(is_read=False) if user_profile else None
+    # ✅ Debugging - Check the stored credit amount
+    print(f"Approving Credit for ServiceRequest ID: {service_request.id}")
+    print(f"Stored Credit Amount Before Transfer: {service_request.credit_amount}")
 
-#     # Fetch service requests accepted by the user
-#     accepted_requests = ServiceRequest.objects.filter(accepted_by=None).exclude(user=user_profile)
+    # Ensure correct decimal format
+    if service_request.credit_amount is None or service_request.credit_amount <= 0:
+        messages.error(request, "Invalid credit amount. Please check the request.")
+        return redirect('dashboard')
 
-#     return render(request, 'dashboard.html', {
-#         'user_profile': user_profile,
-#         'time_credits_given': time_credits_given,
-#         'time_credits_received': time_credits_received,
-#         'transactions': transactions,
-#         'services': services,
-#         'accepted_requests': accepted_requests,
-#         'unread_notifications': unread_notifications,
-#     })
+    hours = Decimal(service_request.credit_amount)  # Ensure proper Decimal conversion
+
+    sender_credit, _ = TimeCredit.objects.get_or_create(user=sender)
+    receiver_credit, _ = TimeCredit.objects.get_or_create(user=receiver)
+
+    print(f"Sender Balance Before: {sender_credit.balance}")
+    print(f"Receiver Balance Before: {receiver_credit.balance}")
+
+    if sender_credit.balance < hours:
+        messages.error(request, "Insufficient balance to complete this transaction.")
+        return redirect('dashboard')
+
+    # Transfer credits
+    sender_credit.balance -= hours
+    receiver_credit.balance += hours
+    sender_credit.save()
+    receiver_credit.save()
+
+    print(f"Sender Balance After: {sender_credit.balance}")
+    print(f"Receiver Balance After: {receiver_credit.balance}")
+
+    # Create Transaction Record
+    Transaction.objects.create(sender=sender, receiver=receiver, service=service_request, hours=hours)
+
+    # Mark request as approved
+    service_request.is_approved = True
+    service_request.save()
+
+    # Notify the worker
+    Notification.objects.create(
+        recipient=receiver,
+        message=f"You have received {hours} hours from {sender.username} for '{service_request.title}'."
+    )
+
+    # Send email notifications
+    send_mail(
+        "Time Credit Received",
+        f"Hello {receiver.username},\n\nYou have received {hours} hours from {sender.username} for completing '{service_request.title}'.",
+        settings.EMAIL_HOST_USER,
+        [receiver.email],
+        fail_silently=False,
+    )
+
+    send_mail(
+        "Time Credit Sent",
+        f"Hello {sender.username},\n\nYou have successfully transferred {hours} hours to {receiver.username} for completing '{service_request.title}'.",
+        settings.EMAIL_HOST_USER,
+        [sender.email],
+        fail_silently=False,
+    )
+
+    messages.success(request, f"{hours} hours transferred to {receiver.username}.")
+    return redirect('dashboard')
+
+
+
 
 
 @login_required
@@ -317,7 +495,7 @@ def manage_credits(request):
 
 
 
-
+@login_required
 def log_hours(request, service_id):
     # Try to get the TimeCredit object for the current user
     try:
@@ -513,6 +691,8 @@ def delete_service(request, service_id):
 
 
 
+from decimal import Decimal  # Import Decimal to avoid float conversion issues
+
 @login_required
 def add_service_request(request):
     if request.method == 'POST':
@@ -520,11 +700,27 @@ def add_service_request(request):
         if form.is_valid():
             service_request = form.save(commit=False)
             service_request.user = request.user
+
+            # ✅ Ensure credit_amount is correctly assigned
+            if 'credit_amount' in form.cleaned_data and form.cleaned_data['credit_amount']:
+                service_request.credit_amount = Decimal(form.cleaned_data['credit_amount'])
+            elif 'hours_requested' in form.cleaned_data and form.cleaned_data['hours_requested']:
+                service_request.credit_amount = Decimal(form.cleaned_data['hours_requested'])
+            else:
+                service_request.credit_amount = Decimal('0.00')
+
             service_request.save()
-            return redirect('request_list')
+
+            print(f"✅ Service Request Created: {service_request}")  # Debugging
+            print(f"✅ Credit Amount Stored: {service_request.credit_amount}")  # Debugging
+
+            return redirect('dashboard')
     else:
         form = ServiceRequestForm()
+
     return render(request, 'add_service_request.html', {'form': form})
+
+
 
 def request_list(request):
     service_requests = ServiceRequest.objects.all()
@@ -534,27 +730,6 @@ def request_list(request):
     return render(request, 'request_list.html', {'service_requests': service_requests})
 
 @login_required
-
-
-# def accept_service_request(request, request_id):
-#     service_request = get_object_or_404(ServiceRequest, id=request_id)
-
-#     # Check if the logged-in user is trying to accept their own request
-#     if service_request.user == request.user:
-#         messages.error(request, "You cannot accept your own request.")
-#         return redirect('request_list')
-
-#     if service_request.accepted_by is None:
-#         service_request.accepted_by = request.user
-#         service_request.save()
-#         messages.success(request, "Request accepted successfully.")
-#     else:
-#         messages.warning(request, "This request has already been accepted.")
-#     return redirect('request_list')
-
-
-
-
 def accept_service_request(request, request_id):
     service_request = get_object_or_404(ServiceRequest, id=request_id)
 
@@ -594,6 +769,37 @@ def accept_service_request(request, request_id):
     return redirect('request_detail', request_id=service_request.id)
 
 
+
+
+@login_required
+def complete_service_request(request, request_id):
+    service_request = get_object_or_404(ServiceRequest, id=request_id)
+    
+    print(f"Completing Service: {service_request}")  # Debugging
+
+    if service_request.user != request.user:
+        messages.error(request, "Only the request owner can mark this as completed.")
+        return redirect('dashboard')
+
+    if not service_request.accepted_by:
+        messages.error(request, "This request has not been accepted yet.")
+        return redirect('dashboard')
+
+    if service_request.is_completed:
+        messages.warning(request, "This request has already been completed.")
+        return redirect('dashboard')
+
+    # Mark request as completed
+    service_request.is_completed = True
+    service_request.save()
+
+    print(f"Updated is_completed: {service_request.is_completed}")  # Debugging
+
+    messages.success(request, "The service request has been marked as completed.")
+    return redirect('dashboard')
+
+
+
 @login_required
 def accepted_requests_view(request):
     # Get requests accepted by the current user
@@ -601,33 +807,81 @@ def accepted_requests_view(request):
     # return render(request, 'dashboard.html', {'accepted_requests': accepted_requests})
     return render(request, 'accepted_requests.html', {'accepted_requests': accepted_requests})
 
-# def service_requests_view(request):
-    context = {
-        'service_requests': ServiceRequest.objects.all(),
-        'user': request.user  # Pass the logged-in user to the template
-    }
-    return render(request, 'request_list.html', context)
 
 
 import logging
 
 logger = logging.getLogger(__name__)
 
+
+
 @login_required
 def request_detail(request, request_id):
     service_request = get_object_or_404(Request, id=request_id)
 
     # Check if the current user owns the request
-    if request.method == 'POST' and service_request.user == request.user:
-        location = request.POST.get('location')  # Get the new location from the form
-        logger.info(f"Updating location for request ID {request_id}: {location}")
+    if request.method == 'POST':
+        # Marking the request as completed
+        if 'mark_completed' in request.POST and service_request.user == request.user:
+            # Ensure the request has been accepted by a provider
+            if not service_request.accepted_by:
+                messages.error(request, "This request has not been accepted yet.")
+                return redirect('request_detail', request_id=request_id)
 
-        if location:
-            service_request.location = location  # Update the location in the database
+            sender = service_request.user  # requester
+            receiver = service_request.accepted_by  # service provider
+            hours = service_request.hours_requested
+
+            # Ensure the requester has enough credits
+            sender_credit, _ = TimeCredit.objects.get_or_create(user=sender)
+            receiver_credit, _ = TimeCredit.objects.get_or_create(user=receiver)
+
+            if sender_credit.balance < hours:
+                messages.error(request, "Insufficient balance to complete this transaction.")
+                return redirect('request_detail', request_id=request_id)
+
+            # Transfer credits
+            sender_credit.balance -= hours
+            receiver_credit.balance += hours
+            sender_credit.save()
+            receiver_credit.save()
+
+            # Create Transaction Record
+            Transaction.objects.create(sender=sender, receiver=receiver, service=service_request, hours=hours)
+
+            # Mark the service request as completed
+            service_request.is_completed = True
             service_request.save()
+
+            # Notify the provider
+            Notification.objects.create(
+                recipient=receiver,
+                message=f"You have received {hours} hours from {sender.username} for '{service_request.title}'."
+            )
+
+            # Send email to provider
+            send_mail(
+                "Service Request Completed",
+                f"Hello {receiver.username},\n\nYou have received {hours} hours from {sender.username} for completing '{service_request.title}'.",
+                "noreply@timecommunitybank.com",
+                [receiver.email],
+                fail_silently=False,
+            )
+
+            messages.success(request, f"{hours} hours transferred to {receiver.username}.")
+            return redirect('request_detail', request_id=request_id)
+
+        # Handling location update logic (if needed)
+        location = request.POST.get('location')
+        if location:
+            service_request.location = location
+            service_request.save()
+            logger.info(f"Updating location for request ID {request_id}: {location}")
             return redirect('request_detail', request_id=request_id)
 
     return render(request, 'request_detail.html', {'request': service_request})
+
+
 
 @login_required
 def edit_service_request(request, request_id):
@@ -859,18 +1113,39 @@ def profile(request):
 def mark_as_completed(request, request_id):
     service_request = get_object_or_404(ServiceRequest, id=request_id)
 
-    if service_request.provider != request.user:
+    if service_request.user != request.user:
         messages.error(request, "You can only mark tasks you are fulfilling as completed.")
         return redirect('dashboard')
 
     if service_request.is_completed:
         messages.warning(request, "This task is already marked as completed.")
-    else:
-        service_request.is_completed = True
-        service_request.save()
-        messages.success(request, "You have marked the task as completed. Waiting for approval from the requester.")
+        return redirect('dashboard')
+    service_request.is_completed = True
+    service_request.save()
 
+    messages.success(request, "The service request has been marked as completed.")
     return redirect('dashboard')
+        
+
+# @login_required
+# def complete_service_request(request, request_id):
+#     service_request = get_object_or_404(ServiceRequest, id=request_id)
+
+#     # Prevent unauthorized completion
+#     if service_request.user != request.user:
+#         messages.error(request, "Only the request owner can mark this as completed.")
+#         return redirect('dashboard')
+
+#     if service_request.is_completed:
+#         messages.warning(request, "This request has already been completed.")
+#         return redirect('dashboard')
+
+#     # Mark request as completed
+#     service_request.is_completed = True
+#     service_request.save()
+
+#     messages.success(request, "The service request has been marked as completed.")
+#     return redirect('dashboard')
 
 
 @login_required
@@ -907,3 +1182,93 @@ def approve_task(request, request_id):
             messages.error(request, "You do not have enough balance to approve this task.")
 
     return redirect('dashboard')
+
+
+
+
+
+
+
+from .forms import ServiceLogForm
+
+@login_required
+def log_service(request):
+    if request.method == 'POST':
+        form = ServiceLogForm(request.POST)
+        if form.is_valid():
+            # Automatically associate the logged-in user with the service log
+            service_log = form.save(commit=False)
+            service_log.user = request.user  # Set the user who provided the service
+            service_log.save()
+            # Optionally: Update user's time credits here
+            messages.success(request, "Your service hours have been successfully logged.")
+            return redirect('dashboard')  # Redirect to the dashboard or any relevant page
+    else:
+        form = ServiceLogForm()
+
+    return render(request, 'log_service.html', {'form': form})
+
+@login_required
+# def approve_service_log(request, log_id):
+#     log = get_object_or_404(ServiceLog, id=log_id)
+    
+#     # Ensure that the logged-in user is the client who made the request
+#     if log.request.user != request.user:
+#         messages.error(request, "You are not authorized to approve this service log.")
+#         return redirect('dashboard')  # or another relevant page
+
+#     # Mark the service log as approved
+#     if log.status == 'pending':
+#         log.status = 'approved'
+#         log.save()
+
+#         # Award credits to the provider
+#         log.provider.timecredit.balance += log.credits_earned
+#         log.provider.timecredit.save()
+
+#         messages.success(request, "You have successfully approved the service log.")
+#     else:
+#         messages.warning(request, "This service log is already approved or rejected.")
+
+#     return redirect('service_request_detail', request_id=log.request.id)
+
+def approve_service_log(request, log_id):
+    log = get_object_or_404(ServiceLog, id=log_id)
+
+    if log.request.user != request.user:
+        messages.error(request, "You are not authorized to approve this service log.")
+        return redirect('dashboard')
+
+    if log.status == 'pending':
+        log.status = 'approved'  # FIXED BUG
+        log.save()
+
+        log.provider.timecredit.balance += log.credits_earned
+        log.provider.timecredit.save()
+
+        messages.success(request, "You have successfully approved the service log.")
+    else:
+        messages.warning(request, "This service log is already approved or rejected.")
+
+    return redirect('request_detail', request_id=log.request.id)
+
+
+@login_required
+def reject_service_log(request, log_id):
+    log = get_object_or_404(ServiceLog, id=log_id)
+    
+    # Ensure that the logged-in user is the client who made the request
+    if log.request.user != request.user:
+        messages.error(request, "You are not authorized to reject this service log.")
+        return redirect('dashboard')  # or another relevant page
+
+    # Mark the service log as rejected
+    if log.status == 'pending':
+        log.status = 'rejected'
+        log.save()
+
+        messages.success(request, "You have successfully rejected the service log.")
+    else:
+        messages.warning(request, "This service log is already approved or rejected.")
+
+    return redirect('request_detail', request_id=log.request.id)

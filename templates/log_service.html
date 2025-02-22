@@ -1,0 +1,99 @@
+{% comment %} {% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Hours</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}"> <!-- Link to your CSS file -->
+</head>
+<body>
+    
+    <header>
+        <h1>Log Hours</h1>
+    </header>
+
+    <main>
+        <main>
+        
+            <section>
+                <h3>Log Hours for {{ service.title }}</h3>
+{% if error %}
+    <p class="error">{{ error }}</p>
+{% endif %}
+<h2>Log Your Service Hours</h2>
+<form method="POST">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Submit</button>
+</form>
+
+<p>Hours Available: {{ hours_available }}</p>
+            </section>
+
+           
+        
+    </main>
+
+    <footer>
+        <a href="{% url 'dashboard' %}" class="btn">Back to Dashboard</a>
+    </footer>
+</body>
+</html> {% endcomment %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Time Community Bank{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .messages {
+            list-style: none;
+            padding: 0;
+        }
+        .messages li {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        a { text-decoration: none; color: blue; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Time Community Bank</h1>
+        
+        <!-- Messages -->
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+        
+        <p><a href="{% url 'dashboard' %}">Back to Dashboard</a></p>
+    </div>
+</body

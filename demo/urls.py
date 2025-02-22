@@ -64,7 +64,18 @@ urlpatterns = [
     path('accepted-requests/', views.accepted_requests_view, name='accepted_requests'),
     path("mark-completed/<int:request_id>/", views.mark_as_completed, name="mark_as_completed"),
     path("approve-task/<int:request_id>/", views.approve_task, name="approve_task"),
+    path('approve_service_log/<int:log_id>/', views.approve_service_log, name='approve_service_log'),
+    path('reject_service_log/<int:log_id>/', views.reject_service_log, name='reject_service_log'),
+        path('service-request/complete/<int:request_id>/', views.complete_service_request, name='complete_service_request'),
 
+        path('request-time-credit/<int:request_id>/', views.request_time_credit, name='request_time_credit'),
+    path('approve-time-credit/<int:request_id>/', views.approve_time_credit, name='approve_time_credit'),
+
+
+
+
+
+   
 
 
 

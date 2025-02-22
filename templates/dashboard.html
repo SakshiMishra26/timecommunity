@@ -93,19 +93,9 @@
                     <ul class="navbar-nav ms-auto text-center">
                         <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'service_list' %}"><i class="fas fa-concierge-bell"></i> Services</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}"><i class="fas fa-cogs"></i> Admin Panel</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'request_list' %}?category=Request"><i class="fas fa-clipboard-list"></i> Requests</a></li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-book"></i> Book Service
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'book_service' service_id=1 %}">Book Service</a></li>
-                                <li><a class="dropdown-item" href="{% url 'calendar' %}">Book Calendar</a></li>
-                            </ul>
-                        </li>
+                        
                         <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}"><i class="fas fa-info-circle"></i> About Us</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'all_reviews' %}"><i class="fas fa-comments"></i> Reviews</a></li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -135,128 +125,221 @@
             {{ notification.message }}
             <form action="{% url 'mark_notification_as_read' notification.id %}" method="post" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-primary">Mark as Read</button>
+                <button type="submit" class="btn btn-sm btn-primary" style="width:200px;">Mark as Read</button>
             </form>
         </li>
     {% empty %}
         <li>No new notifications.</li>
     {% endfor %}
 </ul>
-{% comment %} <h3>Your Time Credits Given</h3>
-<ul>
-    {% for credit in time_credits_given %}
-        <li>{{ credit.amount }} credits given to {{ credit.receiver.username }}</li>
-    {% empty %}
-        <p>No time credits given yet.</p>
-    {% endfor %}
-</ul>
+<div class="container mt-3">
+    <div class="alert alert-info text-center">
+        <h4>Your Time Credit Balance: <strong>{{ time_credit.balance }} hours</strong></h4>
+    </div>
+</div>
 
-<h3>Your Time Credits Received</h3>
-<ul>
-    {% for credit in time_credits_received %}
-        <li>{{ credit.amount }} credits received from {{ credit.giver.username }}</li>
-    {% empty %}
-        <p>No time credits received yet.</p>
-    {% endfor %}
-</ul> {% endcomment %}
+<div class="container mt-4">
+    <div class="row">
+
+        <!-- Left Column -->
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5>Your Requested Services</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for request in request_list %}
+                            <li class="list-group-item">
+                                <strong>{{ request.title }}</strong> - {{ request.credit_amount }} credits
+                                <p>Status: 
+                                    {% if request.is_completed %}
+                                        ✅ Completed  
+                                    {% else %}
+                                        ❌ Not Completed Yet
+                                    {% endif %}
+                                </p>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-danger">No requests yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5>Your Services</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% if services %}
+                            {% for service in services %}
+                                <li class="list-group-item">
+                                    <strong>{{ service.title }}</strong> - {{ service.hours_offered }} hours
+                                    <p>Status: 
+                                        {% if service.is_approved %}
+                                            ✅ Approved and Completed
+                                        {% elif service.is_completed %}
+                                            🕒 Completed, Waiting for Your Approval
+                                            <a href="{% url 'approve_time_credit' service.id %}" class="btn btn-success btn-sm btn-block">Approve Task</a>
+                                        {% else %}
+                                            🔄 In Progress
+                                        {% endif %}
+                                    </p>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item text-danger">No services available.</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Column -->
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5>Requests You've Accepted</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for request in accepted_requests %}
+                            <li class="list-group-item">
+                                {{ request.title }} - Requested by {{ request.requested_by.username }}
+                                <a href="{% url 'request_detail' request.id %}" class="btn btn-info btn-sm btn-block">View Details</a>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-danger">No requests accepted yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5>Tasks You've Completed</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for request in completed_services %}
+                            <li class="list-group-item">
+                                <strong>{{ request.title }}</strong> - 
+                                <span>
+                                    {% if request.credit_amount > 0 %}
+                                        {{ request.credit_amount }} credits
+                                    {% else %}
+                                        <span class="text-danger">Error: No credits assigned!</span>
+                                    {% endif %}
+                                </span>
+                                <form action="{% url 'request_time_credit' request.id %}" method="post" class="mt-2">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary btn-sm btn-block">Request Time Credit</button>
+                                </form>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-danger">No completed tasks pending approval.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-12 col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5>Time Credit Requests Pending Approval</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for request in pending_credit_requests %}
+                            <li class="list-group-item">
+                                {{ request.title }} - {{ request.credit_amount }} credits requested by {{ request.accepted_by.username }}
+                                <form action="{% url 'approve_time_credit' request.id %}" method="post" class="mt-2">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success btn-sm btn-block">Approve</button>
+                                </form>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-danger">No pending time credit approvals.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+  
 
 
-<h5>Your Requests</h5>
-<ul>
-    {% for request in user.requests_posted.all %}
-        <li>
-            <strong>{{ request.title }}</strong> - {{ request.credit_amount }} credits
-            <p>Status: 
-                {% if request.is_approved %}
-                    Approved and completed
-                {% elif request.is_completed %}
-                    Completed, waiting for your approval
-                    <a href="{% url 'approve_task' request.id %}" class="btn btn-success">Approve Task</a>
-                {% else %}
-                    In progress
-                {% endif %}
-            </p>
-        </li>
-    {% empty %}
-        <p>No requests yet.</p>
-    {% endfor %}
-</ul>
 
-<h5>Tasks You're Fulfilling</h5>
-<ul>
-    {% for request in user.requests_accepted.all %}
-        <li>
-            <strong>{{ request.title }}</strong> - {{ request.credit_amount }} credits
-            <p>Status: 
-                {% if request.is_approved %}
-                    Approved and completed
-                {% elif request.is_completed %}
-                    Completed, waiting for approval
-                {% else %}
-                    In progress
-                    <a href="{% url 'mark_as_completed' request.id %}" class="btn btn-primary">Mark as Completed</a>
-                {% endif %}
-            </p>
-        </li>
-    {% empty %}
-        <p>No tasks assigned yet.</p>
-    {% endfor %}
-</ul>
+<div class="container-fluid mt-4">
+    <div class="card" style="width: 48%; margin: auto;">  {# Expands card width to 98% #}
+        <div class="card-header bg-dark text-white text-center">
+            <h3 class="mb-0">Transaction History</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">  {# Ensures table adapts to different screen sizes #}
+                <table class="table table-striped table-bordered table-hover w-100" style="min-width: 60%;">
+                    <thead class="table-dark">
+                        <tr class="text-center">
+                            <th style="width: 18%;">Date</th>
+                            <th style="width: 18%;">Transaction Type</th>
+                            <th style="width: 15%;">Hours</th>
+                            <th style="width: 24%;">From/To</th>
+                            <th style="width: 25%;">Service</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                            <tr class="text-center">
+                                <td>{{ transaction.date|date:"Y-m-d H:i" }}</td>
+                                <td>
+                                    {% if transaction.sender == user %}
+                                        <span class="badge bg-danger">Sent</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Received</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ transaction.hours }}</td>
+                                <td>
+                                    {% if transaction.sender == user %}
+                                        <span class="text-danger">To {{ transaction.receiver.username }}</span>
+                                    {% else %}
+                                        <span class="text-success">From {{ transaction.sender.username }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ transaction.service.title }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-danger">No transactions yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-
-    {% comment %} <h4>Your Time Credit Balance: {{ time_credit.balance }} hours</h4> {% endcomment %}
-
-    {% comment %} <h5>Your Services</h5>
-    <ul>
-        {% for service in services %}
-            <li>{{ service.title }} - {{ service.hours_offered }} hours
-                <a href="{% url 'log_hours' service.id %}">Log Hours</a>
-            </li>
-        {% endfor %}
-    </ul> {% endcomment %}
-    <h5>Your Services</h5>
-    <ul>
-        {% if services %}
-            {% for service in services %}
-                <li>{{ service.title }} - {{ service.hours_offered }} hours
-                    <a href="{% url 'log_hours' service.id %}">Log Hours</a>
-                </li>
-            {% endfor %}
-        {% else %}
-            <li>No services available.</li>
-        {% endif %}
-    </ul>
-    <h5>Transaction History</h5>
-    <ul>
-        {% for transaction in transactions %}
-            <li>{{ transaction.date }} - {{ transaction.transaction_type }} - {{ transaction.hours }} hours</li>
-        {% endfor %}
-    </ul>
-
-
-    <!-- Accepted Requests Section -->
-    <h5>Requests You've Accepted</h5>
-    <ul>
-        {% for request in accepted_requests %}
-            <li>{{ request.title }} - Requested by {{ request.requested_by.username }}
-                <a href="{% url 'request_detail' request.id %}">View Details</a>
-                
-            </li>
-        {% empty %}
-            <p>No requests accepted yet.</p>
-        {% endfor %}
-    </ul>
-    
+   
     {% comment %} <a href="{% url 'manage_credits' %}">Manage Credits</a>
     <a href="{% url 'logout' %}">Logout</a> {% endcomment %}
-    <form action="{% url 'manage_credits' %}" method="get" style="display:inline;">
+    {% comment %} <form action="{% url 'manage_credits' %}" method="get" style="display:inline;">
         <button type="submit" class="btn btn-primary" style="width: 250px; height: 40px; font-size: 16px;">Manage Credits</button>
-    </form>
+    </form> {% endcomment %}
     
     <form action="{% url 'logout' %}" method="post" style="display:inline;">
         {% csrf_token %}
         <button type="submit" class="btn btn-danger" style="width: 250px; height: 40px; font-size: 16px;">Logout</button>
     </form>
+
+
 
     <footer class="footer">
         <div class="container">

@@ -7,17 +7,22 @@ from .models import ServiceRequest,UserLocation
 # from django.core.exceptions import ValidationError
 
 
+from .models import ServiceLog
 
+class ServiceLogForm(forms.ModelForm):
+    class Meta:
+        model = ServiceLog
+        fields = ['request', 'credits_earned']
 
 class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
-        fields = ['title', 'description', 'category', 'hours_offered','price','image','location']
+        fields = ['title', 'description', 'category', 'hours_offered','image','location']
 
 class ServiceRequestForm(forms.ModelForm):
     class Meta:
         model = ServiceRequest
-        fields = ['title', 'description', 'category', 'hours_requested','location']
+        fields = ['title', 'description', 'category', 'hours_requested','location','credit_amount']
 
         
 
